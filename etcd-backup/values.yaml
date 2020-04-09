@@ -1,0 +1,21 @@
+
+image:
+  name: bitnami/etcd:3.4.7
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: etcd-backup
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+nodeSelector:
+  kubernetes.io/hostname: "gammaray-k8s-master-0"
+tolerations: []
+affinity: {}
+schedule:  "55 */6 * * *"
+encryptPassword: ""
+nfsUserID: "1000"
+targetPvcName: nfs-1
