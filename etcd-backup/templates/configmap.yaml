@@ -11,10 +11,12 @@ data:
     chown -R nfs $SNAPSHOT_NAME.enc
     su nfs -s /bin/sh -c 'cp $SNAPSHOT_NAME.enc /backup-target/etcd'
     rm -f /backup/etcd-snapshot*
-    echo "Find old backups:"
-    find /backup-target/etcd/* -mtime 7
-    echo "Find all backups:"
-    find /backup-target/etcd/*
+    export OLD_BACKUPS="$(find /backup-target/etcd/* -mtime $RETENTION)"
+    su nfs -s /bin/sh -c 'if [ "$OLD_BACKUPS" ]; then echo "Deleting backups older than $RETENTION days:"; echo "$OLD_BACKUPS"; rm -v $OLD_BACKUPS; fi'
+    export CURRENT_BACKUPS="$(find /backup-target/etcd/*)"
+    if [ "$CURRENT_BACKUPS" ]; then echo "Current backups:"; echo "$CURRENT_BACKUPS"; fi
+
+
 
 kind: ConfigMap
 metadata:

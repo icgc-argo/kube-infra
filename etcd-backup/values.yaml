@@ -19,3 +19,4 @@ schedule:  "55 */6 * * *"
 encryptPassword: ""
 nfsUserID: "1000"
 targetPvcName: nfs-1
+retention: "7"
