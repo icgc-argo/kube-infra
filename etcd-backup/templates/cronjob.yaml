@@ -19,6 +19,8 @@ spec:
               value: "3"
             - name: NFS_USER_ID
               value: "{{ .Values.nfsUserID }}"
+            - name: RETENTION
+              value: "{{ .Values.retention }}"
             command: ["/bin/sh"]
             args: ["/etc/etcd-backup-script/backup.sh"]
             # args: ["-c","sleep 1000"]
