@@ -1,0 +1,33 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "etcd-backup.fullname" . }}
+  labels:
+    {{- include "etcd-backup.labels" . | nindent 4 }}
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  allowedCapabilities:
+  - '*'
+  hostNetwork: true
+  hostPorts:
+    - HostPortRange:
+      min: 2379
+      max: 2379
+  allowedHostPaths:
+    - pathPrefix: "/backup"
+    - pathPrefix: "/etc/ssl/etcd/ssl"
+    - pathPrefix: "/etc/etcd.env"
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - secret
+  - persistentVolumeClaim
+  - emptyDir
+  - hostPath
