@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "etcd-backup.fullname" . }}
+  labels:
+    {{- include "etcd-backup.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - {{ include "etcd-backup.fullname" . }}
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
