@@ -23,7 +23,7 @@ spec:
               value: "{{ .Values.retention }}"
             command: ["/bin/sh"]
             args: ["/etc/etcd-backup-script/backup.sh"]
-            # args: ["-c","sleep 1000"]
+            # args: ["-c","sleep 2000"]
             volumeMounts:
             - mountPath: /etc/ssl/etcd/ssl
               name: etcd-certs
