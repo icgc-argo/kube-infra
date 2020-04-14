@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "etcd-backup.labels" . | nindent 4 }}
 spec:
+  concurrencyPolicy: Forbid
   schedule:  {{ .Values.schedule }}
   jobTemplate:
     spec:
