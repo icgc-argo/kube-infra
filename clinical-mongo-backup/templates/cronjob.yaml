@@ -1,0 +1,75 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "clinical-mongo-backup.fullname" . }}
+  labels:
+    {{- include "clinical-mongo-backup.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule:  {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: {{ .Values.image.name }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            env:
+            - name: CLINICAL_MONGO_CTL_API
+              value: "3"
+            - name: NFS_USER_ID
+              value: "{{ .Values.nfsUserID }}"
+            - name: RETENTION
+              value: "{{ .Values.retention }}"
+            command: ["/bin/sh"]
+            args: ["/etc/clinical-mongo-backup-script/backup.sh"]
+            # args: ["-c","sleep 2000"]
+            volumeMounts:
+            - mountPath: /etc/ssl/clinical-mongo/ssl
+              name: clinical-mongo-certs
+              readOnly: true
+            - mountPath: /etc/clinical-mongo.env
+              name: clinical-mongo-env
+              readOnly: true
+            - mountPath: /backup
+              name: backup
+            - mountPath: /backup-target
+              name: backup-target
+            - name: clinical-mongo-encrypt-key
+              mountPath: /etc/clinical-mongo-encrypt-key
+            - mountPath: /etc/clinical-mongo-backup-script
+              name: clinical-mongo-backup-script
+              readOnly: true
+          securityContext:
+            runAsUser: 0
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "clinical-mongo-backup.serviceAccountName" . }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          tolerations:
+          - effect: NoSchedule
+            operator: Exists
+          hostNetwork: true
+          volumes:
+          - name: clinical-mongo-certs
+            hostPath:
+              path: /etc/ssl/clinical-mongo/ssl
+              type: Directory
+          - name: clinical-mongo-env
+            hostPath:
+              path: /etc/clinical-mongo.env
+              type: File
+          - name: backup
+            emptyDir: {}
+          - name: backup-target
+            persistentVolumeClaim:
+              claimName: {{ .Values.targetPvcName }}
+          - name: clinical-mongo-encrypt-key
+            secret:
+              secretName: clinical-mongo-encrypt-key
+          - configMap:
+              name: clinical-mongo-backup-script
+            name: clinical-mongo-backup-script

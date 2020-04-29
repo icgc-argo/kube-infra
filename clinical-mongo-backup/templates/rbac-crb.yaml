@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "clinical-mongo-backup.fullname" . }}
+  labels:
+    {{- include "clinical-mongo-backup.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "clinical-mongo-backup.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "clinical-mongo-backup.serviceAccountName" . }}
+  namespace: {{ $.Release.Namespace }}
