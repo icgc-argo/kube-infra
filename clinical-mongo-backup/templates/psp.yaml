@@ -17,7 +17,6 @@ spec:
       max: 2379
   allowedHostPaths:
     - pathPrefix: "/backup"
-    - pathPrefix: "/etc/ssl/clinical-mongo/ssl"
     - pathPrefix: "/etc/clinical-mongo.env"
   runAsUser:
     rule: RunAsAny
@@ -27,7 +26,6 @@ spec:
     rule: RunAsAny
   volumes:
   - configMap
-  - secret
   - persistentVolumeClaim
   - emptyDir
   - hostPath

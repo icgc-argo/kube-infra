@@ -7,7 +7,7 @@ nameOverride: ""
 fullnameOverride: ""
 serviceAccount:
   create: true
-  name: clinical-mongo-backup
+  name: clinical-mongo-backup-dev
 podSecurityContext: {}
 securityContext: {}
 resources: {}
@@ -16,7 +16,15 @@ nodeSelector:
 tolerations: []
 affinity: {}
 schedule:  "55 */6 * * *"
-encryptPassword: ""
 nfsUserID: "1000"
 targetPvcName: nfs-1
 retention: "7"
+
+backupConfigs:
+  MONGO_HOST: host.docker.internal
+  MONGO_PORT: 27017
+  MONGO_DATABASE: clinical
+  BACKUP_ID: clincal_mongo_dev
+  VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
+  VAULT_K8_ROLE: CLINICAL_MONGO_BACKUP_DEV
+  VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/

@@ -1,11 +1,7 @@
 . /etc/clinical-mongo.env
 
-export MONGO_HOST="host.docker.internal"
-export MONGO_PORT="27017"
-export BACKUP_ID="clincal_mongo"
-export MONGO_DATABASE="clinical"
+# sets up backup name
 export SNAPSHOT_NAME="${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
-export VAULT_SECRET_PATH="kv/data/dev/clinical/secrets_v1" \
 
 # downloads vault binary
 export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
@@ -20,10 +16,9 @@ curl -LJO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
   && chmod +x jq
 
 # logs into vault
-export VAULT_TOKEN=$(cat ./vault_token) \
-  && export VAULT_K8_ROLE="CLINICAL_MONGO_BACKUP" \
-  && export VAULT_ADDR="https://vault.infra.argo.cancercollaboratory.org/" \
-  && ./vault login token=$VAULT_TOKEN
+export SA_TOKEN=$(cat ./var/run/secrets/kubernetes.io/serviceaccount/token) \
+  && export VAULT_TOKEN=$(./vault write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -field=token)
+  && ./vault login $VAULT_TOKEN
 
 # retrieves secret from vault
 export VAULT_MONGO_SECRET="$(./vault read -format=json -field=data ${VAULT_SECRET_PATH})" \
