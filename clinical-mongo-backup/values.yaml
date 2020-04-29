@@ -1,6 +1,6 @@
 
 image:
-  name: bitnami/clinical-mongo:3.4.7
+  name: bitnami/mongo:3.4.7
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
