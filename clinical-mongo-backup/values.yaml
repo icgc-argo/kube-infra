@@ -21,11 +21,10 @@ targetPvcName: nfs-1
 retention: "7"
 
 backupConfigs:
-  MONGO_HOST: host.docker.internal
+  MONGO_HOST: clinical-db-mongodb-headless.argo-dev.svc.cluster.local
   MONGO_PORT: 27017
   MONGO_DATABASE: clinical
   BACKUP_ID: clincal_mongo_dev
   VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
-  VAULT_K8_ROLE: CLINICAL_MONGO_BACKUP_DEV
+  VAULT_K8_ROLE: clinical-mongo-backup-dev
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
-  

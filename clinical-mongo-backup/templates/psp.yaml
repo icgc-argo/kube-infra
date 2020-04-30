@@ -11,10 +11,6 @@ spec:
   allowedCapabilities:
   - '*'
   hostNetwork: true
-  hostPorts:
-    - HostPortRange:
-      min: 2379
-      max: 2379
   allowedHostPaths:
     - pathPrefix: "/backup"
     - pathPrefix: "/etc/clinical-mongo.env"
