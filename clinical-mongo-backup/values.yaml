@@ -19,12 +19,13 @@ schedule:  "55 */6 * * *"
 nfsUserID: "1000"
 targetPvcName: nfs-backup
 retention: "7"
+encryptPassword: "encrypt"
 
 backupConfigs:
-  MONGO_HOST: clinical-db-mongodb-headless.argo-dev.svc.cluster.local
+  MONGO_HOST: clinical-db-mongodb-headless.argo-dev
   MONGO_PORT: 27017
   MONGO_DATABASE: clinical
-  BACKUP_ID: clincal_mongo_dev
+  BACKUP_ID: clinical_mongo_dev
   VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
   VAULT_K8_ROLE: clinical-mongo-backup-dev
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/

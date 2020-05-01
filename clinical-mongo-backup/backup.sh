@@ -1,6 +1,6 @@
 # sets up backup name
-export SNAPSHOT_NAME="${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 export TMP_DIR="/backup"
+export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 
 # downloads vault binary
 export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
@@ -17,7 +17,7 @@ export JQ_BINARY_PATH="${TMP_DIR}/jq" \
   && export JQ=$JQ_BINARY_PATH
 
 # logs into vault
-export SA_TOKEN=$(cat ./var/run/secrets/kubernetes.io/serviceaccount/token) \
+export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
   && export VAULT_TOKEN=$($VAULT write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
 
 # retrieves secret from vault
@@ -43,17 +43,14 @@ mongodump --host=$MONGO_HOST \
   && rm -rf $SNAPSHOT_NAME
 
 # moves mongo dump to backup backup volume
-openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "$SNAPSHOT_NAME.enc" -pbkdf2 -kfile "/etc/${BACKUP_ID}-encrypt-key/password"
-adduser nfs -u "$NFS_USER_ID" --system --no-create-home || true
-chown -R nfs "$SNAPSHOT_NAME.enc"
-su nfs -s /bin/sh -c 'cp "$SNAPSHOT_NAME.enc" /backup-target/${BACKUP_ID}'
+openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
+cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
-export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/* -mtime "-$RETENTION" | wc -l)"
-su nfs -s /bin/sh -c  \
-  'if [ "$OLD_BACKUPS" ] && [ "$RECENT_BACKUP_COUNT" -ge "$RETENTION" ];
-    then echo "Deleting backups older than "$RETENTION" days:";
-    echo "$OLD_BACKUPS";
-    rm -v $OLD_BACKUPS;
-  fi'
+export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/* -mtime "-${RETENTION}" | wc -l)"
+if [ "$OLD_BACKUPS" ] && [ "$RECENT_BACKUP_COUNT" -ge "$RETENTION" ];
+  then echo "Deleting backups older than "$RETENTION" days:";
+  echo "$OLD_BACKUPS";
+  rm -v $OLD_BACKUPS;
+fi
 export CURRENT_BACKUPS="$(find /backup-target/${BACKUP_ID}/*)"
 if [ "$CURRENT_BACKUPS" ]; then echo "Current backups:"; echo "$CURRENT_BACKUPS"; fi

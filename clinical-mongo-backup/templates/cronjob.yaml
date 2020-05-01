@@ -44,6 +44,8 @@ spec:
               name: backup
             - mountPath: /backup-target
               name: backup-target
+            - name: encrypt-key
+              mountPath: /etc/encrypt-key
             - mountPath: /etc/clinical-mongo-backup-script
               name: clinical-mongo-backup-script
               readOnly: true
@@ -58,6 +60,9 @@ spec:
           - name: backup-target
             persistentVolumeClaim:
               claimName: {{ .Values.targetPvcName }}
+          - name: encrypt-key
+            secret:
+              secretName: encrypt-key
           - configMap:
               name: clinical-mongo-backup-script
             name: clinical-mongo-backup-script
