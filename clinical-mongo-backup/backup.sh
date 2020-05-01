@@ -1,36 +1,36 @@
-. /etc/clinical-mongo.env
-
 # sets up backup name
 export SNAPSHOT_NAME="${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
+export TMP_DIR="/backup"
 
 # downloads vault binary
 export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
-  && export VAULT_BINARY_ZIP=vault.zip \
+  && export VAULT_BINARY_ZIP="${TMP_DIR}/vault.zip" \
   && curl $VAULT_BINARY_URL --output $VAULT_BINARY_ZIP \
-  && unzip $VAULT_BINARY_ZIP \
-  && rm $VAULT_BINARY_ZIP
+  && unzip $VAULT_BINARY_ZIP -d $TMP_DIR \
+  && rm $VAULT_BINARY_ZIP \
+  && export VAULT="${TMP_DIR}/vault"
 
 # downloads jq binary 
-curl -LJO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 \
-  && mv jq-linux64 jq \
-  && chmod +x jq
+export JQ_BINARY_PATH="${TMP_DIR}/jq" \
+  && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
+  && chmod +x $JQ_BINARY_PATH \
+  && export JQ=$JQ_BINARY_PATH
 
 # logs into vault
 export SA_TOKEN=$(cat ./var/run/secrets/kubernetes.io/serviceaccount/token) \
-  && export VAULT_TOKEN=$(./vault write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -field=token)
-  && ./vault login $VAULT_TOKEN
+  && export VAULT_TOKEN=$($VAULT write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
 
 # retrieves secret from vault
-export VAULT_MONGO_SECRET="$(./vault read -format=json -field=data ${VAULT_SECRET_PATH})" \
+export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET_PATH})" \
   && export MONGO_USERNAME=$(echo $VAULT_MONGO_SECRET \
-    | ./jq '.content' \
-    | ./jq 'fromjson.CLINICAL_DB_USERNAME') \
+    | $JQ '.content' \
+    | $JQ --raw-output 'fromjson.CLINICAL_DB_USERNAME') \
   && export MONGO_PASS=$(echo $VAULT_MONGO_SECRET \
-    | ./jq '.content' \
-    | ./jq 'fromjson.CLINICAL_DB_PASSWORD')
+    | $JQ '.content' \
+    | $JQ --raw-output 'fromjson.CLINICAL_DB_PASSWORD')
 
 # cleans up binaries
-rm ./vault && rm ./jq
+rm $VAULT && rm $JQ
 
 # creates mongo dump
 mongodump --host=$MONGO_HOST \

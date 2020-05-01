@@ -1,4 +1,4 @@
-## Etcd-backup
+## mongo-backup
 
 Backup clinical-mongo data to a persistent volume claim. It is NFS for now and create manually.
 Etcd client creates snapshot and saves locally as encrypted file.
@@ -48,10 +48,6 @@ Etcd client use certificates to authenticate. Run on a master node to mount the 
 Job schedule (cron)
 
 `schedule: "55 */6 * * *"`
-
-Set password when installing the chart, the password is stored in secret
-
-`encryptPassword: ""`
 
 NFS export UID
 

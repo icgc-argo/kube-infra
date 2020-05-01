@@ -10,10 +10,8 @@ spec:
     rule: RunAsAny
   allowedCapabilities:
   - '*'
-  hostNetwork: true
   allowedHostPaths:
     - pathPrefix: "/backup"
-    - pathPrefix: "/etc/clinical-mongo.env"
   runAsUser:
     rule: RunAsAny
   seLinux:
@@ -24,4 +22,3 @@ spec:
   - configMap
   - persistentVolumeClaim
   - emptyDir
-  - hostPath

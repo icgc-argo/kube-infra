@@ -1,6 +1,6 @@
 
 image:
-  name: bitnami/mongo:3.4.7
+  name: bitnami/mongodb:4.0.14-debian-9-r0
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
@@ -17,7 +17,7 @@ tolerations: []
 affinity: {}
 schedule:  "55 */6 * * *"
 nfsUserID: "1000"
-targetPvcName: nfs-1
+targetPvcName: nfs-backup
 retention: "7"
 
 backupConfigs:
