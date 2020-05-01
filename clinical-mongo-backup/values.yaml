@@ -16,7 +16,6 @@ nodeSelector:
 tolerations: []
 affinity: {}
 schedule:  "55 */6 * * *"
-nfsUserID: "1000"
 targetPvcName: nfs-backup
 retention: "7"
 encryptPassword: "encrypt"
