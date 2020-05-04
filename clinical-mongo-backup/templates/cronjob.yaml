@@ -37,7 +37,7 @@ spec:
             - name: RETENTION
               value: "{{ .Values.retention }}"
             command: ["/bin/sh"]
-            args: ["/etc/clinical-mongo-backup-script/backup.sh"]
+            args: ["/opt/clinical-mongo-backup-script/backup.sh"]
             # args: ["-c","sleep 200000"]
             volumeMounts:
             - mountPath: /backup
@@ -46,7 +46,7 @@ spec:
               name: backup-target
             - name: encrypt-key
               mountPath: /etc/encrypt-key
-            - mountPath: /etc/clinical-mongo-backup-script
+            - mountPath: /opt/clinical-mongo-backup-script
               name: clinical-mongo-backup-script
               readOnly: true
           restartPolicy: OnFailure
