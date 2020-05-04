@@ -1,3 +1,4 @@
+---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -12,35 +13,35 @@ spec:
       template:
         spec:
           containers:
-          - name: backup
-            image: {{ .Values.image.name }}
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            env:
-            - name: ETCDCTL_API
-              value: "3"
-            - name: NFS_USER_ID
-              value: "{{ .Values.nfsUserID }}"
-            - name: RETENTION
-              value: "{{ .Values.retention }}"
-            command: ["/bin/sh"]
-            args: ["/etc/etcd-backup-script/backup.sh"]
-            # args: ["-c","sleep 2000"]
-            volumeMounts:
-            - mountPath: /etc/ssl/etcd/ssl
-              name: etcd-certs
-              readOnly: true
-            - mountPath: /etc/etcd.env
-              name: etcd-env
-              readOnly: true
-            - mountPath: /backup
-              name: backup
-            - mountPath: /backup-target
-              name: backup-target
-            - name: etcd-encrypt-key
-              mountPath: /etc/etcd-encrypt-key
-            - mountPath: /etc/etcd-backup-script
-              name: etcd-backup-script
-              readOnly: true
+            - name: backup
+              image: {{ .Values.image.name }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: ETCDCTL_API
+                  value: "3"
+                - name: NFS_USER_ID
+                  value: "{{ .Values.nfsUserID }}"
+                - name: RETENTION
+                  value: "{{ .Values.retention }}"
+              command: ["/bin/sh"]
+              args: ["/etc/etcd-backup-script/backup.sh"]
+              # args: ["-c","sleep 2000"]
+              volumeMounts:
+                - mountPath: /etc/ssl/etcd/ssl
+                  name: etcd-certs
+                  readOnly: true
+                - mountPath: /etc/etcd.env
+                  name: etcd-env
+                  readOnly: true
+                - mountPath: /backup
+                  name: backup
+                - mountPath: /backup-target
+                  name: backup-target
+                - name: etcd-encrypt-key
+                  mountPath: /etc/etcd-encrypt-key
+                - mountPath: /etc/etcd-backup-script
+                  name: etcd-backup-script
+                  readOnly: true
           securityContext:
             runAsUser: 0
           restartPolicy: OnFailure
@@ -50,26 +51,26 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           tolerations:
-          - effect: NoSchedule
-            operator: Exists
+            - effect: NoSchedule
+              operator: Exists
           hostNetwork: true
           volumes:
-          - name: etcd-certs
-            hostPath:
-              path: /etc/ssl/etcd/ssl
-              type: Directory
-          - name: etcd-env
-            hostPath:
-              path: /etc/etcd.env
-              type: File
-          - name: backup
-            emptyDir: {}
-          - name: backup-target
-            persistentVolumeClaim:
-              claimName: {{ .Values.targetPvcName }}
-          - name: etcd-encrypt-key
-            secret:
-              secretName: etcd-encrypt-key
-          - configMap:
+            - name: etcd-certs
+              hostPath:
+                path: /etc/ssl/etcd/ssl
+                type: Directory
+            - name: etcd-env
+              hostPath:
+                path: /etc/etcd.env
+                type: File
+            - name: backup
+              emptyDir: {}
+            - name: backup-target
+              persistentVolumeClaim:
+                claimName: {{ .Values.targetPvcName }}
+            - name: etcd-encrypt-key
+              secret:
+                secretName: etcd-encrypt-key
+            - configMap:
+                name: etcd-backup-script
               name: etcd-backup-script
-            name: etcd-backup-script
