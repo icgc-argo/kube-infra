@@ -5,11 +5,11 @@ metadata:
   labels:
     {{- include "clinical-mongo-backup.labels" . | nindent 4 }}
 rules:
-- apiGroups:
-  - policy
-  resourceNames:
-  - {{ include "clinical-mongo-backup.fullname" . }}
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
+  - apiGroups:
+     - policy
+    resourceNames:
+     - {{ include "clinical-mongo-backup.fullname" . }}
+    resources:
+     - podsecuritypolicies
+    verbs:
+     - use

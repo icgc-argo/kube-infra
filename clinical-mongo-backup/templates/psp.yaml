@@ -9,7 +9,7 @@ spec:
   fsGroup:
     rule: RunAsAny
   allowedCapabilities:
-  - '*'
+    - '*'
   allowedHostPaths:
     - pathPrefix: "/backup"
   runAsUser:
@@ -19,6 +19,6 @@ spec:
   supplementalGroups:
     rule: RunAsAny
   volumes:
-  - configMap
-  - persistentVolumeClaim
-  - emptyDir
+    - configMap
+    - persistentVolumeClaim
+    - emptyDir
