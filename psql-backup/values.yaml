@@ -25,9 +25,9 @@ retention: "7"
 encryptPassword: "encrypt"
 
 backupConfigs:
-  MONGO_HOST: program-service-argo-dev-postgres
-  MONGO_PORT: 5432
-  MONGO_DATABASE: program_service
+  PG_HOST: program-service-argo-dev-postgres
+  PG_PORT: 5432
+  PG_DATABASE: program_service
   BACKUP_ID: program_service_psql_dev
   VAULT_SECRET_PATH: kv/dargo/dev/program-service
   VAULT_K8_ROLE: clinical-mongo-backup-dev
