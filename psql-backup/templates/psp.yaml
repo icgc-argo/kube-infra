@@ -1,0 +1,26 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "psql-backup.fullname" . }}
+  labels:
+    {{- include "psql-backup.labels" . | nindent 4 }}
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  allowedCapabilities:
+  - '*'
+  allowedHostPaths:
+    - pathPrefix: "/backup"
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - secret
+  - persistentVolumeClaim
+  - emptyDir
+  - hostPath
