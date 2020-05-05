@@ -1,0 +1,30 @@
+
+image:
+  name: bitnami/mongodb:4.0.14-debian-9-r0
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: clinical-mongo-backup-dev
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+nodeSelector:
+  kubernetes.io/hostname: "gammaray-k8s-master-0"
+tolerations: []
+affinity: {}
+schedule:  "55 */6 * * *"
+targetPvcName: nfs-backup
+retention: "7"
+encryptPassword: "encrypt"
+
+backupConfigs:
+  MONGO_HOST: clinical-db-mongodb-headless.argo-dev
+  MONGO_PORT: 27017
+  MONGO_DATABASE: clinical
+  BACKUP_ID: clinical_mongo_dev
+  VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
+  VAULT_K8_ROLE: clinical-mongo-backup-dev
+  VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
