@@ -24,6 +24,8 @@ spec:
                   value: "{{ .Values.backupConfigs.BACKUP_ID }}"
                 - name: MONGO_DATABASE
                   value: "{{ .Values.backupConfigs.MONGO_DATABASE }}"
+                - name: MONGO_REPLICASET
+                  value: "{{ .Values.backupConfigs.MONGO_REPLICASET }}"
                 - name: VAULT_SECRET_PATH
                   value: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
                 - name: VAULT_K8_ROLE
@@ -37,8 +39,8 @@ spec:
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
               command: ["/bin/sh"]
-              args: ["/opt/clinical-mongo-backup-script/backup.sh"]
-              # args: ["-c","sleep 200000"]
+              # args: ["/opt/clinical-mongo-backup-script/backup.sh"]
+              args: ["-c","sleep 200000"]
               volumeMounts:
                 - mountPath: /backup
                   name: backup

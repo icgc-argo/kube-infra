@@ -29,15 +29,8 @@ export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET
     | $JQ '.content' \
     | $JQ --raw-output 'fromjson.CLINICAL_DB_PASSWORD')
 
-# cleans up binaries
-rm $VAULT && rm $JQ
-
 # creates mongo dump
-mongodump --host=$MONGO_HOST \
-  --port=$MONGO_PORT \
-  --username=$MONGO_USERNAME \
-  --password=$MONGO_PASS \
-  --authenticationDatabase=$MONGO_DATABASE \
+mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=$MONGO_REPLICASET" \
   --out=$SNAPSHOT_NAME \
   && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
   && rm -rf $SNAPSHOT_NAME
