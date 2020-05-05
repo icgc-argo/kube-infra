@@ -1,5 +1,5 @@
 image:
-  name: postgres:11.1
+  name: icgcargo/kube-infra:psql-backup-latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -30,5 +30,5 @@ backupConfigs:
   PG_DATABASE: program_service
   BACKUP_ID: program_service_psql_dev
   VAULT_SECRET_PATH: kv/dargo/dev/program-service
-  VAULT_K8_ROLE: clinical-mongo-backup-dev
+  VAULT_K8_ROLE: program-service-backup-dev
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/

@@ -23,7 +23,7 @@ spec:
                 - name: PG_DATABASE
                   value: "{{ .Values.backupConfigs.PG_DATABASE }}"
                 - name: BACKUP_ID
-                	value: "{{ .Values.backupConfigs.BACKUP_ID }}"
+                  value: "{{ .Values.backupConfigs.BACKUP_ID }}"
                 - name: VAULT_SECRET_PATH
                   value: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
                 - name: VAULT_K8_ROLE
@@ -41,10 +41,10 @@ spec:
                   mountPath: /backup
                 - name: backup-target
                   mountPath: /backup-target
-                - name: encrypt-key
-                  mountPath: /etc/encrypt-key
-                - mountPath: /opt/psql-backup-script
-                  name: psql-backup-script
+                - name: psql-encrypt-key
+                  mountPath: /etc/psql-encrypt-key
+                - name: psql-backup-script
+                  mountPath: /opt/psql-backup-script
                   readOnly: true
           restartPolicy: OnFailure
           serviceAccountName: {{ include "psql-backup.serviceAccountName" . }}
@@ -57,9 +57,9 @@ spec:
             - name: backup-target
               persistentVolumeClaim:
                 claimName: {{ .Values.targetPvcName }}
-            - name: encrypt-key
+            - name: psql-encrypt-key
               secret:
-                secretName: encrypt-key
+                secretName: psql-encrypt-key
             - configMap:
                 name: psql-backup-script
               name: psql-backup-script

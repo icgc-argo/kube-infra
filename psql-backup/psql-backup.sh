@@ -2,35 +2,14 @@
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 
-# downloads vault binary
-export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
-  && export VAULT_BINARY_ZIP="${TMP_DIR}/vault.zip" \
-  && curl $VAULT_BINARY_URL --output $VAULT_BINARY_ZIP \
-  && unzip $VAULT_BINARY_ZIP -d $TMP_DIR \
-  && rm $VAULT_BINARY_ZIP \
-  && export VAULT="${TMP_DIR}/vault"
-
-# downloads jq binary 
-export JQ_BINARY_PATH="${TMP_DIR}/jq" \
-  && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
-  && chmod +x $JQ_BINARY_PATH \
-  && export JQ=$JQ_BINARY_PATH
-
 # logs into vault
 export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-  && export VAULT_TOKEN=$($VAULT write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
+  && export VAULT_TOKEN=$(vault write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
 
 # retrieves secret from vault
-export PS_SECRETS="$($VAULT read -format=json -field=data ${VAULT_SECRET_PATH})" \
-  && export PG_USER=$(echo $PS_SECRETS \
-    | $JQ '.content' \
-    | $JQ --raw-output 'fromjson.spring.datasource.username') \
-  && export PG_PASS=$(echo $PS_SECRETS \
-    | $JQ '.content' \
-    | $JQ --raw-output 'fromjson.spring.datasource.password')
-
-# cleans up binaries
-rm $VAULT && rm $JQ
+export PS_SECRETS="$(vault read -format=json -field=data ${VAULT_SECRET_PATH})" \
+  && export PG_USER=$(echo $PS_SECRETS | jq -r '.["spring.datasource.user"]') \
+  && export PG_PASS=$(echo $PS_SECRETS | jq -r '.["spring.datasource.password"]')
 
 # Dump Database from postgresql
 pg_dump --host=$PG_HOST \
@@ -42,7 +21,7 @@ pg_dump --host=$PG_HOST \
     && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
     && rm -rf $SNAPSHOT_NAME
 
-# moves mongo dump to backup backup volume
+# moves psql dump to backup volume
 openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
