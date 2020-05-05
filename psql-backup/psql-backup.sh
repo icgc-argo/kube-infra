@@ -2,6 +2,7 @@
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 
+#FIXME: This is bad
 export VAULT_SKIP_VERIFY=true
 
 # logs into vault
