@@ -35,7 +35,7 @@ spec:
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
               command: ["/bin/sh"]
-              args: ["/usr/local/bin/psql-backup.sh"]
+              args: ["/opt/psql-backup-script/psql-backup.sh"]
               volumeMounts:
                 - name: backup
                   mountPath: /backup
@@ -46,6 +46,8 @@ spec:
                 - name: psql-backup-script
                   mountPath: /opt/psql-backup-script
                   readOnly: true
+          securityContext:
+            runAsUser: 1001
           restartPolicy: OnFailure
           serviceAccountName: {{ include "psql-backup.serviceAccountName" . }}
           tolerations:
