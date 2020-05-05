@@ -39,8 +39,8 @@ spec:
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
               command: ["/bin/sh"]
-              # args: ["/opt/clinical-mongo-backup-script/backup.sh"]
-              args: ["-c","sleep 200000"]
+              args: ["/opt/clinical-mongo-backup-script/backup.sh"]
+              # args: ["-c","sleep 200000"]
               volumeMounts:
                 - mountPath: /backup
                   name: backup
