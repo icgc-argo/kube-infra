@@ -24,6 +24,7 @@ backupConfigs:
   MONGO_HOST: clinical-db-mongodb-headless.argo-dev
   MONGO_PORT: 27017
   MONGO_DATABASE: clinical
+  MONGO_REPLICASET: rs0
   BACKUP_ID: clinical_mongo_dev
   VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
   VAULT_K8_ROLE: clinical-mongo-backup-dev

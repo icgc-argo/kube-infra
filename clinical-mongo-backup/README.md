@@ -32,6 +32,7 @@ backupConfigs:
 - `backupConfigs.MONGO_HOST`: FDQN of mongo to back up
 - `backupConfigs.MONGO_PORT`: port number
 - `backupConfigs.MONGO_DATABASE`: `clinical` by default
+- `backupConfigs.MONGO_REPLICASET`: `rs0` by default
 - `backupConfigs.BACKUP_ID`: this goes into `backup_target/<- backupConfigs.BACKUP_ID>` in the nfs
 - `backupConfigs.VAULT_SECRET_PATH`: path to mongo secret in vault
 - `backupConfigs.VAULT_K8_ROLE`: register this with vault for pod role
