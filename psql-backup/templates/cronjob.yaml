@@ -1,0 +1,67 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "psql-backup.fullname" . }}
+  labels:
+    {{- include "psql-backup.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule:  {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: psql-backup
+              image: {{ .Values.image.name }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: PG_HOST
+                  value: "{{ .Values.backupConfigs.PG_HOST }}"
+                - name: PG_PORT
+                  value: "{{ .Values.backupConfigs.PG_PORT }}"
+                - name: PG_DATABASE
+                  value: "{{ .Values.backupConfigs.PG_DATABASE }}"
+                - name: BACKUP_ID
+                  value: "{{ .Values.backupConfigs.BACKUP_ID }}"
+                - name: VAULT_SECRET_PATH
+                  value: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
+                - name: VAULT_K8_ROLE
+                  value: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
+                - name: VAULT_ADDR
+                  value: "{{ .Values.backupConfigs.VAULT_ADDR }}"
+                - name: NFS_USER_ID
+                  value: "{{ .Values.nfsUserID }}"
+                - name: RETENTION
+                  value: "{{ .Values.retention }}"
+              command: ["/bin/sh"]
+              args: ["/opt/psql-backup-script/psql-backup.sh"]
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+                - name: backup-target
+                  mountPath: /backup-target
+                - name: psql-encrypt-key
+                  mountPath: /etc/psql-encrypt-key
+                - name: psql-backup-script
+                  mountPath: /opt/psql-backup-script
+                  readOnly: true
+          securityContext:
+            runAsUser: 1001
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "psql-backup.serviceAccountName" . }}
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+          volumes:
+            - name: backup
+              emptyDir: {}
+            - name: backup-target
+              persistentVolumeClaim:
+                claimName: {{ .Values.targetPvcName }}
+            - name: psql-encrypt-key
+              secret:
+                secretName: psql-encrypt-key
+            - configMap:
+                name: psql-backup-script
+              name: psql-backup-script
