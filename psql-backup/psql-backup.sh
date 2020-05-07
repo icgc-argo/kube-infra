@@ -2,9 +2,6 @@
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 
-#FIXME: This is bad
-export VAULT_SKIP_VERIFY=true
-
 # logs into vault
 export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
   && export VAULT_TOKEN=$(vault write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | jq -r '.auth.client_token')
