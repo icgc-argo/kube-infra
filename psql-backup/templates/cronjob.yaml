@@ -41,9 +41,9 @@ spec:
                   mountPath: /backup
                 - name: backup-target
                   mountPath: /backup-target
-                - name: psql-encrypt-key
+                - name: {{.Values.deployEnv }}-psql-encrypt-key
                   mountPath: /etc/psql-encrypt-key
-                - name: psql-backup-script
+                - name: {{.Values.deployEnv }}-psql-backup-script
                   mountPath: /opt/psql-backup-script
                   readOnly: true
           securityContext:
@@ -59,9 +59,9 @@ spec:
             - name: backup-target
               persistentVolumeClaim:
                 claimName: {{ .Values.targetPvcName }}
-            - name: psql-encrypt-key
+            - name: {{.Values.deployEnv }}-psql-encrypt-key
               secret:
-                secretName: psql-encrypt-key
+                secretName: {{.Values.deployEnv }}-psql-encrypt-key
             - configMap:
-                name: psql-backup-script
-              name: psql-backup-script
+                name: {{.Values.deployEnv }}-psql-backup-script
+              name: {{.Values.deployEnv }}-psql-backup-script
