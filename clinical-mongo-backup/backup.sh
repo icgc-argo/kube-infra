@@ -23,11 +23,9 @@ export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
 # retrieves secret from vault
 export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET_PATH})" \
   && export MONGO_USERNAME=$(echo $VAULT_MONGO_SECRET \
-    | $JQ '.content' \
-    | $JQ --raw-output 'fromjson.CLINICAL_DB_USERNAME') \
+    | $JQ --raw-output ".CLINICAL_DB_USERNAME") \
   && export MONGO_PASS=$(echo $VAULT_MONGO_SECRET \
-    | $JQ '.content' \
-    | $JQ --raw-output 'fromjson.CLINICAL_DB_PASSWORD')
+    | $JQ --raw-output ".CLINICAL_DB_PASSWORD")
 
 # creates mongo dump
 mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=$MONGO_REPLICASET" \

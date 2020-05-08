@@ -26,6 +26,6 @@ backupConfigs:
   MONGO_DATABASE: clinical
   MONGO_REPLICASET: rs0
   BACKUP_ID: clinical_mongo_dev
-  VAULT_SECRET_PATH: kv/data/dev/clinical/secrets_v1
+  VAULT_SECRET_PATH: kv/argo/dev/clinical
   VAULT_K8_ROLE: clinical-mongo-backup-dev
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
