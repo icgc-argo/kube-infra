@@ -9,7 +9,7 @@ fullnameOverride: ""
 
 serviceAccount:
   create: true
-  name: program-service-psql-backup-dev
+  name: program-service-psql-backup-qa
 
 podSecurityContext: {}
 securityContext: {}
@@ -24,11 +24,13 @@ targetPvcName: nfs-backup
 retention: "7"
 encryptPassword: "encrypt"
 
+deployEnv: "qa"
+
 backupConfigs:
-  PG_HOST: program-service-argo-dev-postgres.argo-dev
+  PG_HOST: program-service-argo-qa-postgres.argo-qa
   PG_PORT: 5432
   PG_DATABASE: program_service
-  BACKUP_ID: program_service_psql_dev
-  VAULT_SECRET_PATH: kv/argo/dev/program-service
-  VAULT_K8_ROLE: program-service-psql-backup-dev
+  BACKUP_ID: program_service_psql_qa
+  VAULT_SECRET_PATH: kv/argo/qa/program-service
+  VAULT_K8_ROLE: program-service-psql-backup-qa
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
