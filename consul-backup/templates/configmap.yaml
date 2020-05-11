@@ -1,0 +1,11 @@
+apiVersion: v1
+
+kind: ConfigMap
+metadata:
+  name: consul-backup-script
+
+data:
+  backup.sh: |-
+{{ .Files.Get "backup.sh" | indent 4 }}
+
+

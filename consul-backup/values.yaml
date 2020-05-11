@@ -1,0 +1,24 @@
+
+image:
+  name: icgcargo/consul-backup:latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: consul-backup
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+tolerations: []
+affinity: {}
+schedule:  "55 6 * * *"
+encryptPassword: ""
+nfsUserID: "1000"
+targetPvcName: nfs-1
+retention: "7"
+deployEnv: "infra"
+consulSvcName: "argo-vault-consulchart"
+consulSvcNamespace: "smoke"
+backupID: "consul"
