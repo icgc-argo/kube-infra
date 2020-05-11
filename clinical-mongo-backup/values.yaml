@@ -20,6 +20,8 @@ targetPvcName: nfs-backup
 retention: "7"
 encryptPassword: "encrypt"
 
+deployEnv: dev
+
 backupConfigs:
   MONGO_HOST: clinical-db-mongodb-headless.argo-dev
   MONGO_PORT: 27017

@@ -64,7 +64,7 @@ spec:
                 claimName: {{ .Values.targetPvcName }}
             - name: encrypt-key
               secret:
-                secretName: encrypt-key
-            - configMap:
-                name: clinical-mongo-backup-script
-              name: clinical-mongo-backup-script
+                secretName: {{.Values.deployEnv }}-clinical-mongo-encrypt-key
+            - name: clinical-mongo-backup-script
+              configMap:
+                name: {{.Values.deployEnv }}-clinical-mongo-backup-script

@@ -2,7 +2,7 @@ apiVersion: v1
 
 kind: ConfigMap
 metadata:
-  name: clinical-mongo-backup-script
+  name: {{.Values.deployEnv }}-clinical-mongo-backup-script
 
 data:
   backup.sh: |-
