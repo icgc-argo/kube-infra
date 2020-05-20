@@ -16,22 +16,29 @@ export JQ_BINARY_PATH="${TMP_DIR}/jq" \
   && chmod +x $JQ_BINARY_PATH \
   && export JQ=$JQ_BINARY_PATH
 
+echo "Finished Dependencies."
+
 # logs into vault
 export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
   && export VAULT_TOKEN=$($VAULT write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
 
+echo "Authenticated with Vault."
+
 # retrieves secret from vault
 export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET_PATH})" \
   && export MONGO_USERNAME=$(echo $VAULT_MONGO_SECRET \
-    | $JQ --raw-output ".MONGO_PASS") \
+    | $JQ --raw-output ".MONGO_USER") \
   && export MONGO_PASS=$(echo $VAULT_MONGO_SECRET \
-    | $JQ --raw-output ".MONGO_USER")
+    | $JQ --raw-output ".MONGO_PASS")
+
+echo "Vault secrets obtained."
 
 # creates mongo dump
-mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE" \
-  --out=$SNAPSHOT_NAME \
+mongodump --host=$MONGO_HOST --port=$MONGO_PORT --username=$MONGO_USERNAME --password=$MONGO_PASS --db=$MONGO_DATABASE --authenticationDatabase=admin --out=$SNAPSHOT_NAME \
   && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
   && rm -rf $SNAPSHOT_NAME
+
+echo "Mongo Dump Finished."
 
 # moves mongo dump to backup backup volume
 openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"

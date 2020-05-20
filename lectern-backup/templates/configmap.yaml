@@ -5,5 +5,5 @@ metadata:
   name: {{.Values.deployEnv }}-lectern-backup-script
 
 data:
-  psql-backup.sh: |-
+  lectern-backup.sh: |-
 {{ .Files.Get "lectern-backup.sh" | indent 4 }}

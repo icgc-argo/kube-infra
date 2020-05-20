@@ -27,6 +27,6 @@ backupConfigs:
   MONGO_PORT: 27017
   MONGO_DATABASE: lectern
   BACKUP_ID: lectern_backup_qa
-  VAULT_SECRET_PATH: kv/argo/qa/clinical
+  VAULT_SECRET_PATH: kv/argo/qa/lectern
   VAULT_K8_ROLE: lectern-backup-qa
   VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/

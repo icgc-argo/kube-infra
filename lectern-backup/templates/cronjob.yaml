@@ -36,7 +36,7 @@ spec:
                   value: "{{ .Values.retention }}"
               command: ["/bin/sh"]
               args: ["/opt/lectern-backup-script/lectern-backup.sh"]
-              # args: ["-c","sleep 200000"]
+              #args: ["-c","sleep 200000"]
               volumeMounts:
                 - mountPath: /backup
                   name: backup
@@ -44,8 +44,8 @@ spec:
                   name: backup-target
                 - name: encrypt-key
                   mountPath: /etc/encrypt-key
-                - mountPath: /opt/lectern-script
-                  name: lectern-backup-script
+                - name: lectern-backup-script
+                  mountPath: /opt/lectern-backup-script
                   readOnly: true
           restartPolicy: OnFailure
           serviceAccountName: {{ include "lectern-backup.serviceAccountName" . }}
