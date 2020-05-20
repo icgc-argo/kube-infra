@@ -1,0 +1,66 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "lectern-backup.fullname" . }}
+  labels:
+    {{- include "lectern-backup.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule:  {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: {{ .Values.image.name }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: MONGO_HOST
+                  value: "{{ .Values.backupConfigs.MONGO_HOST }}"
+                - name: MONGO_PORT
+                  value: "{{ .Values.backupConfigs.MONGO_PORT }}"
+                - name: BACKUP_ID
+                  value: "{{ .Values.backupConfigs.BACKUP_ID }}"
+                - name: MONGO_DATABASE
+                  value: "{{ .Values.backupConfigs.MONGO_DATABASE }}"
+                - name: VAULT_SECRET_PATH
+                  value: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
+                - name: VAULT_K8_ROLE
+                  value: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
+                - name: VAULT_ADDR
+                  value: "{{ .Values.backupConfigs.VAULT_ADDR }}"
+                - name: NFS_USER_ID
+                  value: "{{ .Values.nfsUserID }}"
+                - name: RETENTION
+                  value: "{{ .Values.retention }}"
+              command: ["/bin/sh"]
+              args: ["/opt/lectern-backup-script/lectern-backup.sh"]
+              #args: ["-c","sleep 200000"]
+              volumeMounts:
+                - mountPath: /backup
+                  name: backup
+                - mountPath: /backup-target
+                  name: backup-target
+                - name: encrypt-key
+                  mountPath: /etc/encrypt-key
+                - name: lectern-backup-script
+                  mountPath: /opt/lectern-backup-script
+                  readOnly: true
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "lectern-backup.serviceAccountName" . }}
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+          volumes:
+            - name: backup
+              emptyDir: {}
+            - name: backup-target
+              persistentVolumeClaim:
+                claimName: {{ .Values.targetPvcName }}
+            - name: encrypt-key
+              secret:
+                secretName: {{.Values.deployEnv }}-lectern-backup-encrypt-key
+            - name: lectern-backup-script
+              configMap:
+                name: {{.Values.deployEnv }}-lectern-backup-script

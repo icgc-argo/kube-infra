@@ -1,0 +1,32 @@
+
+image:
+  name: bitnami/mongodb:4.0.14-debian-9-r0
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: lectern-backup-qa
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+nodeSelector:
+  kubernetes.io/hostname: "gammaray-k8s-master-0"
+tolerations: []
+affinity: {}
+schedule:  "55 */6 * * *"
+targetPvcName: nfs-backup
+retention: "7"
+encryptPassword: "encrypt"
+
+deployEnv: qa
+
+backupConfigs:
+  MONGO_HOST: mongo-argo-qa-mongodb.argo-qa
+  MONGO_PORT: 27017
+  MONGO_DATABASE: lectern
+  BACKUP_ID: lectern_backup_qa
+  VAULT_SECRET_PATH: kv/argo/qa/lectern
+  VAULT_K8_ROLE: lectern-backup-qa
+  VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
