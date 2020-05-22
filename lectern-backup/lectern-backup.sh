@@ -34,7 +34,8 @@ export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET
 echo "Vault secrets obtained."
 
 # creates mongo dump
-mongodump --host=$MONGO_HOST --port=$MONGO_PORT --username=$MONGO_USERNAME --password=$MONGO_PASS --db=$MONGO_DATABASE --authenticationDatabase=admin --out=$SNAPSHOT_NAME \
+mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=rs0&authSource=admin" \
+  --out=$SNAPSHOT_NAME \
   && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
   && rm -rf $SNAPSHOT_NAME
 
