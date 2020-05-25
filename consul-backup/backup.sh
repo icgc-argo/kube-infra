@@ -3,7 +3,8 @@ export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S
 export CONSUL_BIN="/bin/consul"
 
 
-${CONSUL_BIN} snapshot save ${SNAPSHOT_NAME}
+${CONSUL_BIN} snapshot save ${SNAPSHOT_NAME} || exit 1
+test -e ${SNAPSHOT_NAME} || exit 1
 
 gzip "${SNAPSHOT_NAME}"
 openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.gz"  -out "${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
