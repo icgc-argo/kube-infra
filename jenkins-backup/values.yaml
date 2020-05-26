@@ -1,0 +1,25 @@
+
+image:
+  name: icgcargo/consul-backup:latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: jenkins-backup
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+tolerations: []
+affinity: {}
+schedule:  "55 6 * * *"
+encryptPassword: ""
+nfsUserID: "1000"
+targetPvcName: kube-backup
+retention: "7"
+deployEnv: "infra"
+backupID: "jenkins"
+thinBackupVolume: "jenkins-tb"
+thinBackupPath: "backup"
+jenkinsSvcNamespace: "jenkins"
