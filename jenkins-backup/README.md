@@ -1,8 +1,8 @@
 
-## jenkins-backup
+## Overview
 
-Backup etcd data to a persistent volume claim. It is NFS for now and create manually.
-Etcd client creates snapshot and saves locally as encrypted file.
+Backup jenkins configur ation to a persistent NFS volume claim. This chart uses Thin backup (jenkins plugin) data that is saved to claim attached to jenkins pod.
+The TB backup runs every day at set schedule and the jenkins backup cron job runs after the TB backup has been created.
 
 
 
@@ -11,9 +11,9 @@ Etcd client creates snapshot and saves locally as encrypted file.
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nfs-1
+  name: kube-backup
   labels:
-    type: nfs-test
+    type: kube-backup
 spec:
   capacity:
     storage: 500Gi
@@ -26,9 +26,9 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: nfs-1
+  name: kube-backup
   labels:
-    type: nfs-test
+    type: kube-backup
 spec:
   accessModes:
     - ReadWriteMany
@@ -46,36 +46,33 @@ helm upgrade -i jenkins-backup jenkins-backup --set encryptPassword="my_secure_p
 
 ## Values
 
-Etcd client use certificates to authenticate. Run on a master node to mount the certs.
-
-`
-nodeSelector:
-  kubernetes.io/hostname: "gammaray-k8s-master-0"
-`
-
-Job schedule  (cron)
-
-`
-schedule:  "55 */6 * * *"
-`
-
-Set password when installing the chart, the password is stored in secret
-
-`
+```
+image:
+  name: icgcargo/consul-backup:latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: jenkins-backup
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+tolerations: []
+affinity: {}
+schedule:  "55 8 * * *"
 encryptPassword: ""
-`
-
-NFS export UID
-
-`
 nfsUserID: "1000"
-`
+targetPvcName: kube-backup
+retention: "7"
+deployEnv: "infra"
+backupID: "jenkins"
+thinBackupVolume: "jenkins-thin-backup"
+thinBackupPath: "backup"
+jenkinsSvcNamespace: "jenkins"
+```
 
-Volume claim name
-
-`
-targetPvcName: nfs-1
-`
 
 
 
