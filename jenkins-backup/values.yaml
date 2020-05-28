@@ -15,7 +15,7 @@ tolerations: []
 affinity: {}
 schedule:  "55 6 * * *"
 encryptPassword: ""
-nfsUserID: "1000"
+nfsUserID: 1000
 targetPvcName: kube-backup
 retention: "7"
 deployEnv: "infra"

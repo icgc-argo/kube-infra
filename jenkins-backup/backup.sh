@@ -5,12 +5,12 @@ if [ ! -e "${TB_PATH}/${SNAPSHOT_NAME}" ]; then
 fi
 echo "Backup found: $SNAPSHOT_NAME"
 
-tar czf "${TB_PATH}/${SNAPSHOT_NAME}.tgz" -C ${TB_PATH} "${SNAPSHOT_NAME}"
-echo "Created archive: ${TB_PATH}/${SNAPSHOT_NAME}.tgz"
+tar czf "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz" -C ${TB_PATH} "${SNAPSHOT_NAME}" || exit 1
+echo "Created archive: ${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"
 
-openssl aes-256-cbc -a -salt -in "${TB_PATH}/${SNAPSHOT_NAME}.tgz"  -out "${TB_PATH}/${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
-rm "${TB_PATH}/${SNAPSHOT_NAME}.tgz"
-mv "${TB_PATH}/${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
+openssl aes-256-cbc -a -salt -in "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"  -out "${BACKUP_PATH}/${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
+rm "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"
+cp "${BACKUP_PATH}/${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID} || exit 1
 
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/*.enc -mtime "+$RETENTION")"
 export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/*.enc -mtime "-$RETENTION" | wc -l)"

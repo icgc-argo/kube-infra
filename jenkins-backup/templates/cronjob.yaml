@@ -16,18 +16,20 @@ spec:
               image: {{ .Values.image.name }}
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               env:
-                - name: NFS_USER_ID
-                  value: "{{ .Values.nfsUserID }}"
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
                 - name: TB_PATH
                   value: "/jenkins-tb"
+                - name: BACKUP_PATH
+                  value: "/backup"
                 - name: BACKUP_ID
                   value: "{{ .Values.backupID }}-{{ .Values.jenkinsSvcNamespace }}"
               command: ["/bin/sh"]
               args: ["/etc/jenkins-backup-script/backup.sh"]
               # args: ["-c","sleep 2000"]
               volumeMounts:
+                - mountPath: /backup
+                  name: backup
                 - mountPath: /jenkins-tb
                   name: jenkins-tb
                 - mountPath: /backup-target
@@ -38,10 +40,12 @@ spec:
                   name: jenkins-backup-script
                   readOnly: true
           securityContext:
-            runAsUser: 1001
+            runAsUser: {{ .Values.nfsUserID }}
           restartPolicy: OnFailure
           serviceAccountName: {{ include "jenkins-backup.serviceAccountName" . }}
           volumes:
+            - name: backup
+              emptyDir: {}
             - name: jenkins-tb
               persistentVolumeClaim:
                 claimName: {{ .Values.thinBackupVolume }}
