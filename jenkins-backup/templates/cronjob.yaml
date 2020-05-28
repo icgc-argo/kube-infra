@@ -1,0 +1,60 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "jenkins-backup.fullname" . }}
+  labels:
+    {{- include "jenkins-backup.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule:  {{ .Values.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: {{ .Values.image.name }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: RETENTION
+                  value: "{{ .Values.retention }}"
+                - name: TB_PATH
+                  value: "/jenkins-tb"
+                - name: BACKUP_PATH
+                  value: "/backup"
+                - name: BACKUP_ID
+                  value: "{{ .Values.backupID }}-{{ .Values.jenkinsSvcNamespace }}"
+              command: ["/bin/sh"]
+              args: ["/etc/jenkins-backup-script/backup.sh"]
+              # args: ["-c","sleep 2000"]
+              volumeMounts:
+                - mountPath: /backup
+                  name: backup
+                - mountPath: /jenkins-tb
+                  name: jenkins-tb
+                - mountPath: /backup-target
+                  name: backup-target
+                - name: encrypt-key
+                  mountPath: /etc/encrypt-key
+                - mountPath: /etc/jenkins-backup-script
+                  name: jenkins-backup-script
+                  readOnly: true
+          securityContext:
+            runAsUser: {{ .Values.nfsUserID }}
+          restartPolicy: OnFailure
+          serviceAccountName: {{ include "jenkins-backup.serviceAccountName" . }}
+          volumes:
+            - name: backup
+              emptyDir: {}
+            - name: jenkins-tb
+              persistentVolumeClaim:
+                claimName: {{ .Values.thinBackupVolume }}
+            - name: backup-target
+              persistentVolumeClaim:
+                claimName: {{ .Values.targetPvcName }}
+            - name: encrypt-key
+              secret:
+                secretName:  {{.Values.deployEnv }}-jenkins-encrypt-key
+            - configMap:
+                name: jenkins-backup-script
+              name: jenkins-backup-script
