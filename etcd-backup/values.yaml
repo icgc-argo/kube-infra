@@ -12,10 +12,10 @@ podSecurityContext: {}
 securityContext: {}
 resources: {}
 nodeSelector:
-  kubernetes.io/hostname: "gammaray-k8s-master-0"
+  kubernetes.io/hostname: "kube-hostname"
 tolerations: []
 affinity: {}
-schedule:  "55 */6 * * *"
+schedule:  "55 6 * * *"
 encryptPassword: ""
 nfsUserID: "1000"
 targetPvcName: nfs-1

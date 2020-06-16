@@ -11,11 +11,9 @@ serviceAccount:
 podSecurityContext: {}
 securityContext: {}
 resources: {}
-nodeSelector:
-  kubernetes.io/hostname: "gammaray-k8s-master-0"
 tolerations: []
 affinity: {}
-schedule:  "55 */6 * * *"
+schedule:  "55 6 * * *"
 targetPvcName: nfs-backup
 retention: "7"
 encryptPassword: "encrypt"
@@ -23,11 +21,11 @@ encryptPassword: "encrypt"
 deployEnv: dev
 
 backupConfigs:
-  MONGO_HOST: clinical-db-mongodb-headless.argo-dev
+  MONGO_HOST: mongo-host
   MONGO_PORT: 27017
-  MONGO_DATABASE: clinical
+  MONGO_DATABASE: mogo-db
   MONGO_REPLICASET: rs0
-  BACKUP_ID: clinical_mongo_dev
-  VAULT_SECRET_PATH: kv/argo/dev/clinical
-  VAULT_K8_ROLE: clinical-mongo-backup-dev
-  VAULT_ADDR: https://vault.infra.argo.cancercollaboratory.org/
+  BACKUP_ID: mongo-env
+  VAULT_SECRET_PATH: kv/secret/mongo
+  VAULT_K8_ROLE: mongo-role
+  VAULT_ADDR: https://vault.local
