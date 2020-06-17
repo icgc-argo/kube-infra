@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 # sets up backup name
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
@@ -10,7 +13,7 @@ export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_l
   && rm $VAULT_BINARY_ZIP \
   && export VAULT="${TMP_DIR}/vault"
 
-# downloads jq binary 
+# downloads jq binary
 export JQ_BINARY_PATH="${TMP_DIR}/jq" \
   && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
   && chmod +x $JQ_BINARY_PATH \
@@ -34,7 +37,7 @@ mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$
   && rm -rf $SNAPSHOT_NAME
 
 # moves mongo dump to backup backup volume
-openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
+openssl aes-256-cbc -v -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
 export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/* -mtime "-${RETENTION}" | wc -l)"
