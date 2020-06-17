@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 # sets up backup name
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
@@ -12,15 +15,20 @@ export PS_SECRETS="$(vault read -format=json -field=data ${VAULT_SECRET_PATH})" 
   && export PGPASSWORD=$(echo $PS_SECRETS | jq -r '.["spring.datasource.password"]')
 
 # Dump Database from postgresql
+echo "Connecting to postgres database...."
 pg_dump --host=$PG_HOST \
     --port=$PG_PORT \
     --username=$PG_USER \
     --dbname=$PG_DATABASE \
-    --format=tar \
-    | gzip > "${SNAPSHOT_NAME}.tar.gz"
+    --verbose \
+    --format=tar > "${SNAPSHOT_NAME}.tar"
+test -e "${SNAPSHOT_NAME}.tar"
+echo "Created archive: ${SNAPSHOT_NAME}.tar"
+gzip "${SNAPSHOT_NAME}.tar"
 
 # moves psql dump to backup volume
-openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/psql-encrypt-key/password"
+echo "Encrypting...."
+openssl aes-256-cbc -v -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile "/etc/psql-encrypt-key/password"
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
 export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/* -mtime "-${RETENTION}" | wc -l)"
