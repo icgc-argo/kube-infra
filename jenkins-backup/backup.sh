@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 export SNAPSHOT_NAME=$(basename $(find $TB_PATH -type d  -maxdepth 1 -name FULL* -mtime -1 | sort | tail -1))
 if [ ! -e "${TB_PATH}/${SNAPSHOT_NAME}" ]; then
     echo "File ${TB_PATH}/${SNAPSHOT_NAME} does not exist"
@@ -8,7 +11,7 @@ echo "Backup found: $SNAPSHOT_NAME"
 tar czf "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz" -C ${TB_PATH} "${SNAPSHOT_NAME}" || exit 1
 echo "Created archive: ${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"
 
-openssl aes-256-cbc -a -salt -in "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"  -out "${BACKUP_PATH}/${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
+openssl aes-256-cbc -v -a -salt -in "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"  -out "${BACKUP_PATH}/${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
 rm "${BACKUP_PATH}/${SNAPSHOT_NAME}.tgz"
 cp "${BACKUP_PATH}/${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID} || exit 1
 

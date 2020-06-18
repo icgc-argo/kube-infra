@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
 export CONSUL_BIN="/bin/consul"
@@ -7,7 +10,7 @@ ${CONSUL_BIN} snapshot save ${SNAPSHOT_NAME} || exit 1
 test -e ${SNAPSHOT_NAME} || exit 1
 
 gzip "${SNAPSHOT_NAME}"
-openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.gz"  -out "${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
+openssl aes-256-cbc -v -a -salt -in "${SNAPSHOT_NAME}.gz"  -out "${SNAPSHOT_NAME}.enc" -pbkdf2 -kfile /etc/encrypt-key/password
 
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 
