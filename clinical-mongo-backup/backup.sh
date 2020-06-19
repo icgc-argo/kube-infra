@@ -31,12 +31,14 @@ export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET
     | $JQ --raw-output ".CLINICAL_DB_PASSWORD")
 
 # creates mongo dump
+echo "Creating mongo dump...."
 mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=$MONGO_REPLICASET" \
   --out=$SNAPSHOT_NAME \
   && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
   && rm -rf $SNAPSHOT_NAME
 
 # moves mongo dump to backup backup volume
+echo "Encrypting mongo dump...."
 openssl aes-256-cbc -v -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
