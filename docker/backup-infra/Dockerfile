@@ -6,10 +6,10 @@ ADD https://releases.hashicorp.com/consul/1.8.0/consul_1.8.0_linux_amd64.zip /tm
 USER root
 
 RUN apt-get update; \
-    apt-get install unzip jq openssl etcd-client mongodb-clients postgresql-client -y; \
+    apt-get install unzip jq etcd-client mongodb-clients postgresql-client -y; \
     unzip /tmp/vault_1.4.1_linux_amd64.zip -d /usr/local/bin/; \
-    unzip /tmp/consul_1.8.0_linux_amd64.zip -d /usr/local/bin/; \
+    unzip /tmp/vault_1.4.1_linux_amd64.zip -d /usr/local/bin/; \
     apt-get remove -y unzip; \
-    useradd -u 1001 backup-infra
+    useradd -u 8999 backup-infra
 
-USER 1001
+USER 8999
