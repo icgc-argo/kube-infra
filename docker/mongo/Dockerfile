@@ -7,6 +7,7 @@ USER root
 RUN apt-get update; \
     apt-get install unzip jq -y; \
     unzip /tmp/vault_1.4.1_linux_amd64.zip -d /usr/local/bin/; \
-    apt-get remove -y unzip;
+    apt-get remove -y unzip; \
+    useradd -u 1001 backup-infra
 
 USER 1001
