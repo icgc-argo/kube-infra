@@ -10,6 +10,6 @@ RUN apt-get update; \
     unzip /tmp/vault_1.4.1_linux_amd64.zip -d /usr/local/bin/; \
     unzip /tmp/vault_1.4.1_linux_amd64.zip -d /usr/local/bin/; \
     apt-get remove -y unzip; \
-    useradd -u 8999 backup-infra
+    useradd -u 1001 backup-infra
 
-USER 8999
+USER 1001
