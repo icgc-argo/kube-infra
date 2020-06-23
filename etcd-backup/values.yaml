@@ -1,6 +1,6 @@
 
 image:
-  name: bitnami/etcd:3.4.7
+  name: icgcargo/backup-etcd:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
