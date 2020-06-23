@@ -1,5 +1,5 @@
 image:
-  name: icgcargo/kube-infra:psql-backup-latest
+  name: icgcargo/backup-psql:latest
   pullPolicy: Always
 
 imagePullSecrets: []
