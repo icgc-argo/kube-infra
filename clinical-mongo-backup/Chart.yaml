@@ -2,5 +2,5 @@ apiVersion: v2
 name: clinical-mongo-backup
 description: Backup clinical-mongo cluster
 type: application
-version: 0.1.2
-appVersion: 1.17.0
+version: 0.2.0
+appVersion: 1.18.0

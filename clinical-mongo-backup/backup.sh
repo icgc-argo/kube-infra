@@ -4,20 +4,23 @@ set -e
 # sets up backup name
 export TMP_DIR="/backup"
 export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S_%Z)"
+export VAULT=$(which vault)
+export JQ=$(which jq)
 
-# downloads vault binary
-export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
-  && export VAULT_BINARY_ZIP="${TMP_DIR}/vault.zip" \
-  && curl $VAULT_BINARY_URL --output $VAULT_BINARY_ZIP \
-  && unzip $VAULT_BINARY_ZIP -d $TMP_DIR \
-  && rm $VAULT_BINARY_ZIP \
-  && export VAULT="${TMP_DIR}/vault"
+# # downloads vault binary
+# export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
+#   && export VAULT_BINARY_ZIP="${TMP_DIR}/vault.zip" \
+#   && curl $VAULT_BINARY_URL --output $VAULT_BINARY_ZIP \
+#   && unzip $VAULT_BINARY_ZIP -d $TMP_DIR \
+#   && rm $VAULT_BINARY_ZIP \
+#   && export VAULT="${TMP_DIR}/vault"
 
-# downloads jq binary
-export JQ_BINARY_PATH="${TMP_DIR}/jq" \
-  && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
-  && chmod +x $JQ_BINARY_PATH \
-  && export JQ=$JQ_BINARY_PATH
+# # downloads jq binary
+# export JQ_BINARY_PATH="${TMP_DIR}/jq" \
+#   && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
+#   && chmod +x $JQ_BINARY_PATH \
+#   && export JQ=$JQ_BINARY_PATH
+
 
 # logs into vault
 export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
