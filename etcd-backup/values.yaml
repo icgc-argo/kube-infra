@@ -12,7 +12,7 @@ podSecurityContext: {}
 securityContext: {}
 resources: {}
 nodeSelector:
-  kubernetes.io/hostname: "kube-hostname"
+  node-role.kubernetes.io/master: ""
 tolerations: []
 affinity: {}
 schedule:  "55 6 * * *"
