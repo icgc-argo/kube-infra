@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kafka-connect.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+    helm.sh/chart: {{ include "kafka-connect.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "kafka-connect.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.name }}"
+          command:
+          - "/bin/sh"
+          args:
+          - "/opt/bitnami/kafka/custConfig/connect.sh"
+          ports:
+            - name: connector
+              containerPort: 8083
+          volumeMounts:
+            - name: configuration
+              mountPath: /opt/bitnami/kafka/custConfig
+            - name: filesink
+              mountPath: /opt/bitnami/kafka/filesink
+      volumes:
+        - name: configuration
+          configMap:
+            name: {{ include "kafka-connect.fullname" . }}-config
+        - name: filesink
+          persistentVolumeClaim:
+              claimName: {{ include "kafka-connect.fullname" . }}-data
