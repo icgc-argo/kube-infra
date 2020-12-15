@@ -12,3 +12,9 @@ storage:
 topic: mytopic
 sinkName: local-file-sink-backup
 restartTimeout: "23h"
+nodeSelector:
+  type: infra
+tolerations:
+  - key: type
+    value: infra
+
