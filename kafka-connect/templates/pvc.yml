@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "kafka-connect.fullname" . }}-data
+  labels:
+    app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+    helm.sh/chart: {{ include "kafka-connect.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  resources:
+    requests:
+      storage: "{{ .Values.storage.size }}"
+  accessModes:
+    - ReadWriteOnce

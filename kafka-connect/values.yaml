@@ -1,0 +1,20 @@
+
+image:
+  name: icgcargo/kafka-connect:latest
+serviceAccount:
+  create: true
+  name: kafka-connect
+kafkaSvcNamespace: "kafka-namespace"
+kafkaSvcName: "kafka-headless"
+replicaCount: 1
+storage:
+  size: 20Gi
+topic: mytopic
+sinkName: local-file-sink-backup
+restartTimeout: "23h"
+nodeSelector:
+  type: infra
+tolerations:
+  - key: type
+    value: infra
+
