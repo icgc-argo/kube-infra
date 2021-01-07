@@ -1,7 +1,6 @@
 FROM bitnami/kafka:latest
 USER root
 RUN apt-get update && apt-get install -y \
-    rsync \
     encfs \
     rsnapshot \
     && rm -rf /var/lib/apt/lists/*
