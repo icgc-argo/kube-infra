@@ -2,7 +2,7 @@ apiVersion: v1
 
 kind: ConfigMap
 metadata:
-  name: {{ include "kafka-connect.fullname" . }}-config
+  name: {{ include "kafka-connect.fullname" . }}-connect
   labels:
     app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
     helm.sh/chart: {{ include "kafka-connect.chart" . }}
@@ -13,9 +13,10 @@ data:
     #!/bin/sh
     set -e
     sink_name={{ .Values.sinkName }}
+    sink_path={{ .Values.sinkPath }}
     topic_name={{ .Values.topic }}
-    sink_file=/opt/bitnami/kafka/filesink/${topic_name}-${sink_name}-$(date +%Y-%m).sink
-    sink_link="/opt/bitnami/kafka/filesink/kafka.sink"
+    sink_file=${sink_path}/${topic_name}-${sink_name}-$(date +%Y-%m).sink
+    sink_link="${sink_path}/kafka.sink"
 
     touch ${sink_file}
     [ -L ${sink_link} ] && ls -la ${sink_link} && echo "removing existing symlink..." && rm ${sink_link}

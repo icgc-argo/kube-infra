@@ -31,10 +31,22 @@ spec:
             - name: connector
               containerPort: 8083
           volumeMounts:
-            - name: configuration
+            - name: config-connect
               mountPath: /opt/bitnami/kafka/custConfig
             - name: filesink
               mountPath: /opt/bitnami/kafka/filesink
+            {{- if .Values.backup.enabled }}
+            - name: config-backup
+              mountPath: /opt/bitnami/kafka/backupConfig
+            - name: backup
+              mountPath: /mnt/backup_enc
+            - name: nfs-backup
+              mountPath: /mnt/backup_nfs_enc
+            - name: encrypt-key
+              mountPath: /etc/encrypt-key
+            {{- end }}
+          securityContext:
+            privileged: true
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -44,9 +56,25 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: configuration
+        - name: config-connect
           configMap:
-            name: {{ include "kafka-connect.fullname" . }}-config
+            name: {{ include "kafka-connect.fullname" . }}-connect
         - name: filesink
           persistentVolumeClaim:
               claimName: {{ include "kafka-connect.fullname" . }}-data
+        {{- if .Values.backup.enabled }}
+        - name: config-backup
+          configMap:
+            name: {{ include "kafka-connect.fullname" . }}-backup
+        - name: backup
+          persistentVolumeClaim:
+              claimName: {{ include "kafka-connect.fullname" . }}-backup
+        - name: nfs-backup
+          persistentVolumeClaim:
+            claimName: {{ .Values.targetPvcName }}
+        - name: encrypt-key
+          secret:
+            secretName:  {{ include "kafka-connect.fullname" . }}-enc
+        {{- end }}
+      securityContext:
+        fsGroup: 1001
