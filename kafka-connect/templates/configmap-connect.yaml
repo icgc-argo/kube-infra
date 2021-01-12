@@ -11,7 +11,7 @@ metadata:
 data:
   connect.sh: |-
     #!/bin/sh
-    set -e
+    #set -e
     sink_name={{ .Values.sinkName }}
     sink_path={{ .Values.sinkPath }}
     topic_name={{ .Values.topic }}
@@ -29,7 +29,13 @@ data:
     echo "Current sink file: ${sink_file}"
     ls -la ${sink_file}
 
-    timeout --preserve-status {{ .Values.restartTimeout }} /opt/bitnami/kafka/bin/connect-standalone.sh /opt/bitnami/kafka/custConfig/connect-standalone.properties /opt/bitnami/kafka/custConfig/connect-file-sink.properties
+    timeout -s HUP {{ .Values.restartTimeout }}  /opt/bitnami/kafka/bin/connect-standalone.sh /opt/bitnami/kafka/custConfig/connect-standalone.properties /opt/bitnami/kafka/custConfig/connect-file-sink.properties
+
+    # backup if enabled
+    if [ $BACKUPS_ENABLED = "true" ]
+      then echo "Backups enabled"
+      sh /opt/bitnami/kafka/backupConfig/backup.sh
+    fi
 
     ls -la ${sink_file}
     rm ${sink_link}

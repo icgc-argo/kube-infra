@@ -27,6 +27,13 @@ spec:
           - "/bin/sh"
           args:
           - "/opt/bitnami/kafka/custConfig/connect.sh"
+          # - "-c"
+          # - "sleep 3600"
+          {{- if .Values.backup.enabled }}
+          env:
+          - name: BACKUPS_ENABLED
+            value: "true"
+          {{- end }}
           ports:
             - name: connector
               containerPort: 8083
@@ -47,6 +54,8 @@ spec:
             {{- end }}
           securityContext:
             privileged: true
+            capabilities:
+              add: ["SYS_ADMIN"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

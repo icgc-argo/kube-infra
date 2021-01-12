@@ -8,12 +8,11 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  allowPrivilegeEscalation: true
   privileged: true
   fsGroup:
     rule: RunAsAny
   allowedCapabilities:
-    - '*'
+    - 'SYS_ADMIN'
   runAsUser:
     rule: MustRunAsNonRoot
   seLinux:
