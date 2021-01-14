@@ -9,6 +9,6 @@ RUN mkdir /mnt/backup
 RUN chown kafka /mnt/backup
 RUN mkdir /run/backup
 RUN chown kafka /run/backup
-RUN chown -r kafka /opt/bitnami/kafka
+RUN chown -r kafka /opt/bitnami
 USER 1001
 CMD /opt/bitnami/kafka/bin/connect-standalone.sh /opt/bitnami/kafka/custConfig/connect-standalone.properties /opt/bitnami/kafka/custConfig/connect-file-sink.properties
