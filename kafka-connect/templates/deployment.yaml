@@ -18,6 +18,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.role: kafka-client
     spec:
       serviceAccountName: {{ include "kafka-connect.serviceAccountName" . }}
       containers:
@@ -26,9 +27,9 @@ spec:
           command:
           - "/bin/sh"
           args:
-          - "/opt/bitnami/kafka/custConfig/connect.sh"
-          # - "-c"
-          # - "sleep 3600"
+          # - "/opt/bitnami/kafka/custConfig/connect.sh"
+          - "-c"
+          - "sleep 3600"
           {{- if .Values.backup.enabled }}
           env:
           - name: BACKUPS_ENABLED
@@ -44,11 +45,9 @@ spec:
               mountPath: /opt/bitnami/kafka/filesink
             {{- if .Values.backup.enabled }}
             - name: config-backup
-              mountPath: /opt/bitnami/kafka/backupConfig
-            - name: backup
-              mountPath: /mnt/backup_enc
+              mountPath: /etc/backupConfig
             - name: nfs-backup
-              mountPath: /mnt/backup_nfs_enc
+              mountPath: /mnt/backup_enc
             - name: encrypt-key
               mountPath: /etc/encrypt-key
             {{- end }}
@@ -75,9 +74,6 @@ spec:
         - name: config-backup
           configMap:
             name: {{ include "kafka-connect.fullname" . }}-backup
-        - name: backup
-          persistentVolumeClaim:
-              claimName: {{ include "kafka-connect.fullname" . }}-backup
         - name: nfs-backup
           persistentVolumeClaim:
             claimName: {{ .Values.targetPvcName }}

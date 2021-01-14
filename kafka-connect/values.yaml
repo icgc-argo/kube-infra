@@ -20,9 +20,6 @@ tolerations:
     value: infra
 backup:
   enabled: false
-  storage:
-    size: 40Gi
   retention: 7
-  path: /backup
 encryptPassword: "encryptPassword"
 targetPvcName: nfs-backup

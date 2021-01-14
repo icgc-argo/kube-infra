@@ -23,18 +23,34 @@ data:
 
     ln -s ${sink_file} ${sink_link}
 
-    test -w ${sink_file} || exit
-    test -L ${sink_link} || exit
+    test -w ${sink_file} || { echo "File ${sink_file} is not writable" ; exit ; }
+    test -L ${sink_link} || { echo "File ${sink_link} is not a symlink" ; exit ; }
 
     echo "Current sink file: ${sink_file}"
     ls -la ${sink_file}
 
-    timeout -s HUP {{ .Values.restartTimeout }}  /opt/bitnami/kafka/bin/connect-standalone.sh /opt/bitnami/kafka/custConfig/connect-standalone.properties /opt/bitnami/kafka/custConfig/connect-file-sink.properties
+    timeout -s HUP {{ .Values.restartTimeout }} /opt/bitnami/kafka/bin/connect-standalone.sh /opt/bitnami/kafka/custConfig/connect-standalone.properties /opt/bitnami/kafka/custConfig/connect-file-sink.properties
+
+    # exit code 124 indicates that timeout timed out
+    exit_code=$?
+    [ $exit_code = "124" ] || { echo "Kafka connect error: $exit_code" ; exit ; }
+
+    # compress old files
+
+    old_files=$(find ${sink_path} -name "${topic_name}-${sink_name}*.sink"  -mtime +30)
+    for file in $old_files
+      do
+        test -f $file || { echo "File $file does not exist" ; exit ; }
+        archived_file=$file-"$(date +%s)"
+        echo "Compressing: $file"
+        mv $file $archived_file
+        gzip $archived_file
+      done
 
     # backup if enabled
     if [ $BACKUPS_ENABLED = "true" ]
       then echo "Backups enabled"
-      sh /opt/bitnami/kafka/backupConfig/backup.sh
+      sh /etc/backupConfig/backup.sh
     fi
 
     ls -la ${sink_file}

@@ -13,26 +13,26 @@ data:
     #!/bin/sh
     set -e
     DATA_PATH="{{ .Values.sinkPath }}"
-    SNAP_PATH="/mnt/backup"
-    SNAP_PATH_ENC="/mnt/backup_nfs_enc"
-    RSNAP_CONFIG="/opt/bitnami/kafka/backupConfig/rsnapshot.conf"
+    BACKUP_PATH="/mnt/backup"
+    BACKUP_PATH_ENC="/mnt/backup_enc"
+    RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
 
     if [ ! -d  $DATA_PATH ]
       then
         echo "The path does not exist: $DATA_PATH"
         exit
     fi
-    test -d  $SNAP_PATH || mkdir -p $SNAP_PATH
-    test -d  $SNAP_PATH_ENC || mkdir -p $SNAP_PATH_ENC
+    test -d  $BACKUP_PATH || mkdir -p $BACKUP_PATH
+    test -d  $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
 
     # use "standard" mode to allow rsnapshot hard links
-    (mount | grep -w "$SNAP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $SNAP_PATH_ENC $SNAP_PATH --standard -S)
+    (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
 
     # rsnapshot
     rsnapshot -c $RSNAP_CONFIG alpha
 
     # cleanup
-    fusermount -u $SNAP_PATH
+    fusermount -u $BACKUP_PATH
 
   rsnapshot.conf: |-
     config_version	1.2
@@ -46,6 +46,6 @@ data:
     verbose		4
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
-    rsync_short_args	-avz
+    rsync_short_args	-a
     rsync_long_args	--delete	--numeric-ids	--relative	--delete-excluded
     backup	{{ .Values.sinkPath }}		localhost/
