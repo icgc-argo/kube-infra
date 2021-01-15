@@ -70,3 +70,12 @@ data:
     tasks.max=1
     file=/opt/bitnami/kafka/filesink/kafka.sink
     topics={{ .Values.topic }}
+  connect-log4j.properties: |-
+    log4j.rootLogger=ERROR, stdout, connectAppender
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.connectAppender=org.apache.log4j.DailyRollingFileAppender
+    log4j.appender.connectAppender.DatePattern='.'yyyy-MM-dd-HH
+    log4j.appender.connectAppender.File=${kafka.logs.dir}/connect.log
+    log4j.appender.connectAppender.layout=org.apache.log4j.PatternLayout
+    connect.log.pattern=[%d] %p %m (%c:%L)%n

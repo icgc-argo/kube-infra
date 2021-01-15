@@ -13,6 +13,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -27,9 +29,9 @@ spec:
           command:
           - "/bin/sh"
           args:
-          # - "/opt/bitnami/kafka/custConfig/connect.sh"
-          - "-c"
-          - "sleep 3600"
+          - "/opt/bitnami/kafka/custConfig/connect.sh"
+          # - "-c"
+          # - "sleep 3600"
           {{- if .Values.backup.enabled }}
           env:
           - name: BACKUPS_ENABLED
@@ -43,6 +45,9 @@ spec:
               mountPath: /opt/bitnami/kafka/custConfig
             - name: filesink
               mountPath: /opt/bitnami/kafka/filesink
+            - name: config-connect
+              mountPath: /opt/bitnami/kafka/config/connect-log4j.properties
+              subPath: connect-log4j.properties
             {{- if .Values.backup.enabled }}
             - name: config-backup
               mountPath: /etc/backupConfig

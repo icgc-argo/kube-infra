@@ -14,7 +14,7 @@ data:
     set -e
     DATA_PATH="{{ .Values.sinkPath }}"
     BACKUP_PATH="/mnt/backup"
-    BACKUP_PATH_ENC="/mnt/backup_enc"
+    BACKUP_PATH_ENC="/mnt/backup_enc/{{ .Release.Name }}"
     RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
 
     if [ ! -d  $DATA_PATH ]
@@ -43,9 +43,9 @@ data:
     cmd_logger	/usr/bin/logger
     cmd_rsnapshot_diff	/usr/bin/rsnapshot-diff
     retain	alpha	{{ .Values.backup.retention }}
-    verbose		4
+    verbose		3
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
     rsync_short_args	-a
-    rsync_long_args	--delete	--numeric-ids	--relative	--delete-excluded
+    rsync_long_args	--numeric-ids	--relative
     backup	{{ .Values.sinkPath }}		localhost/
