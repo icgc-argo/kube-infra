@@ -64,19 +64,19 @@ data:
     # kafka_server=kafka
     # restore_from_time="2021-01-19T15:57"
     params=$#
-    if [ "$#" -ne 4 ]; then
+    if [ "$params" -ne 4 ]; then
         echo "Illegal number of parameters: required: 4, supplied: $params"
         echo
-        echo "Usage $0 restore_topic kafka_server \"restore_files\"  \"restore_from_time\""
+        echo "Usage: $0 restore_topic kafka_server \"restore_files\"  \"restore_from_time\""
         echo
         echo "restore_topic: destination topic to restore to"
         echo "kafka_server: kafka server"
-        echo "restore_files: path to the files to restore from, example \"/opt/bitnami/kafka/filesink/connect*.sink\" - must be in quotes"
-        echo "restore_from_time: timestamp to restore from, example \"2021-01-19T15:57\" - must be in quotes"
+        echo "restore_files: path to the files to restore from, example \"/opt/bitnami/kafka/filesink/connect*.sink\" - quoted string"
+        echo "restore_from_time: timestamp to restore from, example \"2021-01-19T15:57\" - quoted string"
         echo
         echo "Example:"
         echo
-        echo "sh /opt/bitnami/kafka/filesink/restore.sh connect1 kafka \"/opt/bitnami/kafka/filesink/snapshot/connect*.sink\"  \"2021-01-19T15:57\""
+        echo "sh /etc/connectConfig/restore.sh connect1 kafka \"/opt/bitnami/kafka/filesink/snapshot/connect*.sink\"  \"2021-01-19T15:57\""
 
         exit
     fi
