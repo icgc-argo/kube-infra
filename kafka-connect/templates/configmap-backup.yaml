@@ -42,10 +42,12 @@ data:
     cmd_rsync	/usr/bin/rsync
     cmd_logger	/usr/bin/logger
     cmd_rsnapshot_diff	/usr/bin/rsnapshot-diff
+    include	*.sink
+    exclude	'*'
     retain	alpha	{{ .Values.backup.retention }}
-    verbose		3
+    verbose		4
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
-    rsync_short_args	-a
-    rsync_long_args	--numeric-ids	--relative
+    rsync_short_args   -a
+    rsync_long_args	--delete --numeric-ids --no-links --delete-excluded
     backup	{{ .Values.sinkPath }}		localhost/
