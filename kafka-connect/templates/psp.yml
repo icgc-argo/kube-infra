@@ -1,0 +1,26 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "kafka-connect.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+    helm.sh/chart: {{ include "kafka-connect.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  privileged: true
+  fsGroup:
+    rule: RunAsAny
+  allowedCapabilities:
+    - 'SYS_ADMIN'
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - configMap
+    - persistentVolumeClaim
+    - emptyDir
+    - secret

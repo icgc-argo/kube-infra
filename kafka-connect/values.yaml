@@ -11,10 +11,15 @@ storage:
   size: 20Gi
 topic: mytopic
 sinkName: local-file-sink-backup
+sinkPath: "/opt/bitnami/kafka/filesink"
 restartTimeout: "23h"
 nodeSelector:
   type: infra
 tolerations:
   - key: type
     value: infra
-
+backup:
+  enabled: false
+  retention: 7
+encryptPassword: "encryptPassword"
+targetPvcName: nfs-backup

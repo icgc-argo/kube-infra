@@ -1,0 +1,53 @@
+apiVersion: v1
+
+kind: ConfigMap
+metadata:
+  name: {{ include "kafka-connect.fullname" . }}-backup
+  labels:
+    app.kubernetes.io/name: {{ include "kafka-connect.name" . }}
+    helm.sh/chart: {{ include "kafka-connect.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  backup.sh: |-
+    #!/bin/sh
+    set -e
+    DATA_PATH="{{ .Values.sinkPath }}"
+    BACKUP_PATH="/mnt/backup"
+    BACKUP_PATH_ENC="/mnt/backup_enc/{{ .Release.Name }}"
+    RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
+
+    if [ ! -d  $DATA_PATH ]
+      then
+        echo "The path does not exist: $DATA_PATH"
+        exit
+    fi
+    test -d  $BACKUP_PATH || mkdir -p $BACKUP_PATH
+    test -d  $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
+
+    # use "standard" mode to allow rsnapshot hard links
+    (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
+
+    # rsnapshot
+    rsnapshot -c $RSNAP_CONFIG alpha
+
+    # cleanup
+    fusermount -u $BACKUP_PATH
+
+  rsnapshot.conf: |-
+    config_version	1.2
+    snapshot_root	/mnt/backup
+    cmd_cp		/bin/cp
+    cmd_rm		/bin/rm
+    cmd_rsync	/usr/bin/rsync
+    cmd_logger	/usr/bin/logger
+    cmd_rsnapshot_diff	/usr/bin/rsnapshot-diff
+    include	'*.sink'
+    exclude	'*'
+    retain	alpha	{{ .Values.backup.retention }}
+    verbose		3
+    loglevel	3
+    lockfile	/var/run/backup/rsnapshot.pid
+    rsync_short_args	-a
+    rsync_long_args	--delete --numeric-ids --no-links --delete-excluded
+    backup	{{ .Values.sinkPath }}		localhost/
