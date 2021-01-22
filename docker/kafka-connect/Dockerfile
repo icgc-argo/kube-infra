@@ -4,7 +4,8 @@ RUN apt-get update && apt-get install -y \
     encfs \
     rsnapshot \
     && rm -rf /var/lib/apt/lists/*
-RUN adduser --uid 1001 kafka --system
+RUN addgroup --gid 1001 kafka --system
+RUN adduser --uid 1001 -gid 1001 kafka --system
 RUN mkdir /mnt/backup
 RUN chown kafka /mnt/backup
 RUN mkdir /run/backup
