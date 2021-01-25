@@ -27,7 +27,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.name }}"
           command:
-          - "/bin/sh"
+          - "/bin/bash"
           args:
           - "/etc/connectConfig/connect.sh"
           # - "-c"
@@ -43,6 +43,8 @@ spec:
           volumeMounts:
             - name: config-connect
               mountPath: /etc/connectConfig
+            - name: config-connect-file-sink
+              mountPath: /etc/filesinkConfig
             - name: filesink
               mountPath: /opt/bitnami/kafka/filesink
             - name: config-connect
@@ -72,6 +74,8 @@ spec:
         - name: config-connect
           configMap:
             name: {{ include "kafka-connect.fullname" . }}-connect
+        - name: config-connect-file-sink
+          emptyDir: {}
         - name: filesink
           persistentVolumeClaim:
               claimName: {{ include "kafka-connect.fullname" . }}-data
