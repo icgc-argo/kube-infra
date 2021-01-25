@@ -17,40 +17,29 @@ data:
     topic_list_values={{ .Values.topicList }}
     IFS=',' read -a topic_list  <<<  $topic_list_values
     echo Topic list: ${topic_list[@]}
-    echo Topic count: ${#topic_list[@]}
 
     for my_topic in ${topic_list[@]}
       do
-        echo
-        echo "Topic: $my_topic"
-        echo "======"
-        echo
         sink_name="${my_topic}-${sink_prefix}"
         sink_file=${sink_path}/${sink_name}-$(date +%Y-%m).sink
         sink_link="${sink_path}/${sink_name}.sink"
         touch ${sink_file}
-        [ -L ${sink_link} ] && ls -la ${sink_link} && echo "removing existing symlink..." && rm ${sink_link}
 
+        # Recreate existing symlink
+        [ -L ${sink_link} ] && rm ${sink_link}
         ln -s ${sink_file} ${sink_link}
 
         test -w ${sink_file} || { echo "File ${sink_file} is not writable" ; exit ; }
         test -L ${sink_link} || { echo "File ${sink_link} is not a symlink" ; exit ; }
 
         echo "Topic: $my_topic  Sink file: ${sink_file} Sink link: ${sink_link}"
-        ls -la ${sink_file}
-        ls -la ${sink_link}
-        echo
 
-        echo "Writing configs:"
-        echo
         echo "name=${sink_name}" > /etc/filesinkConfig/${sink_name}.properties
         echo "connector.class=FileStreamSink" >> /etc/filesinkConfig/${sink_name}.properties
         echo "tasks.max=1" >> /etc/filesinkConfig/${sink_name}.properties
         echo "file=${sink_file}" >> /etc/filesinkConfig/${sink_name}.properties
         echo "topics=$my_topic" >> /etc/filesinkConfig/${sink_name}.properties
-        echo
-        cat /etc/filesinkConfig/${sink_name}.properties
-        echo
+        # cat /etc/filesinkConfig/${sink_name}.properties
 
         config_name="/etc/filesinkConfig/${sink_name}.properties"
 
