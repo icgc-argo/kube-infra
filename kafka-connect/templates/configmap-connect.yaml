@@ -34,15 +34,16 @@ data:
 
         echo "Topic: $my_topic  Sink file: ${sink_file} Sink link: ${sink_link}"
 
+        # Create config file for each topic
         echo "name=${sink_name}" > /etc/filesinkConfig/${sink_name}.properties
         echo "connector.class=FileStreamSink" >> /etc/filesinkConfig/${sink_name}.properties
         echo "tasks.max=1" >> /etc/filesinkConfig/${sink_name}.properties
         echo "file=${sink_file}" >> /etc/filesinkConfig/${sink_name}.properties
         echo "topics=$my_topic" >> /etc/filesinkConfig/${sink_name}.properties
         # cat /etc/filesinkConfig/${sink_name}.properties
-
         config_name="/etc/filesinkConfig/${sink_name}.properties"
 
+        # Create list of dynamic configs to pass to the connect process
         config_list+=($config_name)
         sink_file_list+=($sink_file)
       done
@@ -53,8 +54,7 @@ data:
     exit_code=$?
     [ $exit_code = "124" ] || { echo "Kafka connect error: $exit_code" ; exit ; }
 
-    # compress old files
-
+    # Compress old files
     old_files=$(find ${sink_path} -name "*${sink_prefix}*.sink" -type f -mtime +30)
     for file in $old_files
       do
