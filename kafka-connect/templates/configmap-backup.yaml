@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   backup.sh: |-
-    #!/bin/sh
+    #!/bin/bash
     set -e
     DATA_PATH="{{ .Values.sinkPath }}"
     BACKUP_PATH="/mnt/backup"
@@ -43,6 +43,7 @@ data:
     cmd_logger	/usr/bin/logger
     cmd_rsnapshot_diff	/usr/bin/rsnapshot-diff
     include	'*.sink'
+    include	'*.gz'
     exclude	'*'
     retain	alpha	{{ .Values.backup.retention }}
     verbose		3

@@ -9,10 +9,10 @@ kafkaSvcName: "kafka-headless"
 replicaCount: 1
 storage:
   size: 20Gi
-topic: mytopic
+topicList: t1,t2
 sinkName: local-file-sink-backup
 sinkPath: "/opt/bitnami/kafka/filesink"
-restartTimeout: "23h"
+restartTimeout: "24h"
 nodeSelector:
   type: infra
 tolerations:
@@ -23,3 +23,4 @@ backup:
   retention: 7
 encryptPassword: "encryptPassword"
 targetPvcName: nfs-backup
+loglevel: ERROR
