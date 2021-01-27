@@ -47,7 +47,9 @@ spec:
           }
           sh """
             cd docker/psql
-            docker build . -t ${dockerRegistry}/${dockerRepo}:latest -t ${dockerRegistry}/${dockerRepo}:${imageVersion}
+            docker build . -t ${dockerRegistry}/${dockerRepo}:latest
+            imageVersion=$(docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.psql-backup.version" }}' ${dockerRegistry}/${dockerRepo}:latest)
+            docker build . -t ${dockerRegistry}/${dockerRepo}:${imageVersion}
             docker push ${dockerRegistry}/${dockerRepo}:${imageVersion}
             docker push ${dockerRegistry}/${dockerRepo}:latest
           """
