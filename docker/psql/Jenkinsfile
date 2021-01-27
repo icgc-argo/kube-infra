@@ -1,6 +1,6 @@
 def dockerRegistry = "ghcr.io"
 def dockerRepo = "icgc-argo/backup-psql"
-def imageVersion = "0.1.0"
+def imageVersion = ""
 
 pipeline {
   agent {
