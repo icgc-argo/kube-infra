@@ -1,5 +1,7 @@
-def dockerRepo = "ghcr.io/icgc-argo/backup-psql"
+def dockerRegistry = "ghcr.io"
+def dockerRepo = "icgc-argo/backup-psql"
 def imageVersion = "0.1.0"
+
 pipeline {
   agent {
     kubernetes {
@@ -35,18 +37,19 @@ spec:
 """
     }
   }
+
   stages {
     stage('Build and publish docker image') {
       steps {
         container('docker') {
           withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            sh 'docker login ghcr.io -u $USERNAME -p $PASSWORD'
+            sh 'docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD'
           }
           sh """
             cd docker/psql
-            docker build . -t ${dockerRepo}:latest -t ${dockerRepo}:${imageVersion}
-            docker push ${dockerRepo}:${imageVersion}
-            docker push ${dockerRepo}:latest
+            docker build . -t ${dockerRegistry}/${dockerRepo}:latest -t ${dockerRegistry}/${dockerRepo}:${imageVersion}
+            docker push ${dockerRegistry}/${dockerRepo}:${imageVersion}
+            docker push ${dockerRegistry}/${dockerRepo}:latest
           """
         }
       }
