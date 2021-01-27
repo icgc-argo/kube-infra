@@ -44,9 +44,9 @@ spec:
           }
           sh """
             cd docker/psql
-            docker build . -t ${dockerRepo}:latest -t ${dockerRepo}:${imageVersion}"
-            docker push ${dockerRepo}:${imageVersion}"
-            docker push ${dockerRepo}:latest"
+            docker build . -t ${dockerRepo}:latest -t ${dockerRepo}:${imageVersion}
+            docker push ${dockerRepo}:${imageVersion}
+            docker push ${dockerRepo}:latest
           """
         }
       }
