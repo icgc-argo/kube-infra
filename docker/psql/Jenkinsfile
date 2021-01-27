@@ -43,7 +43,7 @@ spec:
       steps {
         container('docker') {
           withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            sh 'docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD'
+            sh "docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD"
           }
           sh """
             cd docker/psql
