@@ -1,3 +1,5 @@
+def dockerRepo = "ghcr.io/icgc-argo/backup-psql"
+def chartVersion = "0.1.0"
 pipeline {
   agent {
     kubernetes {
@@ -37,7 +39,15 @@ spec:
     stage('Build docker image with cache') {
       steps {
         container('docker') {
-          sh "cd docker/psql && docker build --tag icgcargo/backup-psql:latest ."
+          withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            sh 'docker login ghcr.io -u $USERNAME -p $PASSWORD'
+          }
+          sh """
+            cd docker/psql
+            docker build . -t ${dockerRepo}:latest -t ${dockerRepo}:${version}"
+            docker push ${dockerRepo}:${version}"
+            docker push ${dockerRepo}:latest"
+          """
         }
       }
     }
