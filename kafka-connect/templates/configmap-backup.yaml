@@ -17,16 +17,29 @@ data:
     BACKUP_PATH_ENC="/mnt/backup_enc/{{ .Release.Name }}"
     RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
 
-    if [ ! -d  $DATA_PATH ]
+    if [[ ! -d $DATA_PATH ]]
       then
         echo "The path does not exist: $DATA_PATH"
         exit
     fi
-    test -d  $BACKUP_PATH || mkdir -p $BACKUP_PATH
-    test -d  $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
+    test -d $BACKUP_PATH || mkdir -p $BACKUP_PATH
+    test -d $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
 
     # use "standard" mode to allow rsnapshot hard links
-    (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
+    # (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
+
+    # Check if directory is not mounted
+    if [[ -z $(mount | grep "$BACKUP_PATH type fuse.gocryptfs") ]]
+      then
+        if [[ ! -f $BACKUP_PATH_ENC/gocryptfs.conf ]]
+          #initialize encrypted volume
+          then
+          gocryptfs -init -passfile /etc/encrypt-key/password $BACKUP_PATH_ENC
+        fi
+      #mount if already initialized
+      gocryptfs -q -passfile /etc/encrypt-key/password $BACKUP_PATH_ENC $BACKUP_PATH
+    fi
+
 
     # rsnapshot
     rsnapshot -c $RSNAP_CONFIG alpha
