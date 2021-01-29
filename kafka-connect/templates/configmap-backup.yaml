@@ -12,44 +12,44 @@ data:
   backup.sh: |-
     #!/bin/bash
     set -e
-    DATA_PATH="{{ .Values.sinkPath }}"
-    BACKUP_PATH="/mnt/backup"
-    BACKUP_PATH_ENC="/mnt/backup_enc/{{ .Release.Name }}"
-    RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
+    data_path="{{ .Values.sinkPath }}"
+    backup_dev="/mnt/backup"
+    backup_dev_enc="/mnt/backup_enc"
+    rsnap_config="/etc/backupConfig/rsnapshot.conf"
 
-    if [[ ! -d $DATA_PATH ]]
+    if [[ ! -d $data_path ]]
       then
-        echo "The path does not exist: $DATA_PATH"
+        echo "The path does not exist: $data_path"
         exit
     fi
-    test -d $BACKUP_PATH || mkdir -p $BACKUP_PATH
-    test -d $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
+    test -d $backup_dev || mkdir -p $backup_dev
+    test -d $backup_dev_enc || mkdir -p $backup_dev_enc
 
     # use "standard" mode to allow rsnapshot hard links
-    # (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
+    # (mount | grep -w "$backup_dev" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $backup_dev_enc $backup_dev --standard -S)
 
     # Check if directory is not mounted
-    if [[ -z $(mount | grep "$BACKUP_PATH type fuse.gocryptfs") ]]
+    if [[ -z $(mount | grep "$backup_dev type fuse.gocryptfs") ]]
       then
-        if [[ ! -f $BACKUP_PATH_ENC/gocryptfs.conf ]]
-          #initialize encrypted volume
+        if [[ ! -f $backup_dev_enc/gocryptfs.conf ]]
           then
-          gocryptfs -init -passfile /etc/encrypt-key/password $BACKUP_PATH_ENC
+          echo "Initialize encrypted volume..."
+          gocryptfs -init -plaintextnames -passfile /etc/encrypt-key/password $backup_dev_enc
         fi
-      #mount if already initialized
-      gocryptfs -q -passfile /etc/encrypt-key/password $BACKUP_PATH_ENC $BACKUP_PATH
+      echo "Mount encrypted FS"
+      gocryptfs -nosyslog -q -passfile /etc/encrypt-key/password $backup_dev_enc $backup_dev
     fi
 
 
     # rsnapshot
-    rsnapshot -c $RSNAP_CONFIG alpha
+    rsnapshot -c $rsnap_config alpha
 
     # cleanup
-    fusermount -u $BACKUP_PATH
+    fusermount -u $backup_dev
 
   rsnapshot.conf: |-
     config_version	1.2
-    snapshot_root	/mnt/backup
+    snapshot_root	/mnt/backup/{{ .Release.Name }}
     cmd_cp		/bin/cp
     cmd_rm		/bin/rm
     cmd_rsync	/usr/bin/rsync
