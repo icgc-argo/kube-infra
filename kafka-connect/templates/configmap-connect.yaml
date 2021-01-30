@@ -11,7 +11,7 @@ metadata:
 data:
   connect.sh: |-
     #!/bin/bash
-    set -e
+    # set -e
     sink_prefix={{ .Values.sinkName }}
     sink_path={{ .Values.sinkPath }}
     topic_list_values={{ .Values.topicList }}
@@ -22,17 +22,11 @@ data:
       do
         sink_name="${my_topic}-${sink_prefix}"
         sink_file=${sink_path}/${sink_name}-$(date +%Y-%m).sink
-        sink_link="${sink_path}/${sink_name}.sink"
         touch ${sink_file}
 
-        # Recreate existing symlink
-        [ -L ${sink_link} ] && rm ${sink_link}
-        ln -s ${sink_file} ${sink_link}
-
         test -w ${sink_file} || { echo "File ${sink_file} is not writable" ; exit ; }
-        test -L ${sink_link} || { echo "File ${sink_link} is not a symlink" ; exit ; }
 
-        echo "Topic: $my_topic  Sink file: ${sink_file} Sink link: ${sink_link}"
+        echo "Topic: $my_topic  Sink file: ${sink_file}"
 
         # Create config file for each topic
         echo "name=${sink_name}" > /etc/filesinkConfig/${sink_name}.properties
@@ -40,7 +34,6 @@ data:
         echo "tasks.max=1" >> /etc/filesinkConfig/${sink_name}.properties
         echo "file=${sink_file}" >> /etc/filesinkConfig/${sink_name}.properties
         echo "topics=$my_topic" >> /etc/filesinkConfig/${sink_name}.properties
-        # cat /etc/filesinkConfig/${sink_name}.properties
         config_name="/etc/filesinkConfig/${sink_name}.properties"
 
         # Create list of dynamic configs to pass to the connect process
@@ -67,12 +60,8 @@ data:
 
     # backup if enabled
     if [ $BACKUPS_ENABLED = "true" ]
-      then echo "Backups enabled"
       bash /etc/backupConfig/backup.sh
     fi
-
-    ls -la ${sink_file_list}
-    # rm ${sink_link}
 
   restore.sh: |-
 
@@ -113,8 +102,11 @@ data:
     ls $restore_files
     echo
     echo "Restoring from timestamp: $restore_from_time"
+    echo
 
     #check if the files are readable
+    echo "The following files will be used for restore:"
+    echo
     for file in $restore_files
       do
         test -f $file  || { echo "File $file does not exist" ; exit ; }

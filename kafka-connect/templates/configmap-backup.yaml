@@ -25,9 +25,6 @@ data:
     test -d $backup_dev || mkdir -p $backup_dev
     test -d $backup_dev_enc || mkdir -p $backup_dev_enc
 
-    # use "standard" mode to allow rsnapshot hard links
-    # (mount | grep -w "$backup_dev" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $backup_dev_enc $backup_dev --standard -S)
-
     # Check if directory is not mounted
     if [[ -z $(mount | grep "$backup_dev type fuse.gocryptfs") ]]
       then
