@@ -12,31 +12,42 @@ data:
   backup.sh: |-
     #!/bin/bash
     set -e
-    DATA_PATH="{{ .Values.sinkPath }}"
-    BACKUP_PATH="/mnt/backup"
-    BACKUP_PATH_ENC="/mnt/backup_enc/{{ .Release.Name }}"
-    RSNAP_CONFIG="/etc/backupConfig/rsnapshot.conf"
+    data_path="{{ .Values.sinkPath }}"
+    backup_dev="/mnt/backup"
+    backup_dev_enc="/mnt/backup_enc"
+    rsnap_config="/etc/backupConfig/rsnapshot.conf"
 
-    if [ ! -d  $DATA_PATH ]
+    if [[ ! -d $data_path ]]
       then
-        echo "The path does not exist: $DATA_PATH"
+        echo "The path does not exist: $data_path"
         exit
     fi
-    test -d  $BACKUP_PATH || mkdir -p $BACKUP_PATH
-    test -d  $BACKUP_PATH_ENC || mkdir -p $BACKUP_PATH_ENC
+    test -d $backup_dev || mkdir -p $backup_dev
+    test -d $backup_dev_enc || mkdir -p $backup_dev_enc
 
-    # use "standard" mode to allow rsnapshot hard links
-    (mount | grep -w "$BACKUP_PATH" | grep "type fuse.encfs" ) || (cat /etc/encrypt-key/password | encfs $BACKUP_PATH_ENC $BACKUP_PATH --standard -S)
+    # Check if directory is not mounted
+    if [[ -z $(mount | grep "$backup_dev type fuse.gocryptfs") ]]
+      then
+        if [[ ! -f $backup_dev_enc/gocryptfs.conf ]]
+          then
+          echo "Initialize encrypted volume..."
+          gocryptfs -init -plaintextnames -passfile /etc/encrypt-key/password $backup_dev_enc
+        fi
+      echo "Mount encrypted FS"
+      gocryptfs -nosyslog -q -passfile /etc/encrypt-key/password $backup_dev_enc $backup_dev
+    fi
+
 
     # rsnapshot
-    rsnapshot -c $RSNAP_CONFIG alpha
+    echo "Creating snapshot..."
+    rsnapshot -c $rsnap_config alpha
 
     # cleanup
-    fusermount -u $BACKUP_PATH
+    fusermount -u $backup_dev
 
   rsnapshot.conf: |-
     config_version	1.2
-    snapshot_root	/mnt/backup
+    snapshot_root	/mnt/backup/{{ .Release.Name }}
     cmd_cp		/bin/cp
     cmd_rm		/bin/rm
     cmd_rsync	/usr/bin/rsync
@@ -46,7 +57,7 @@ data:
     include	'*.gz'
     exclude	'*'
     retain	alpha	{{ .Values.backup.retention }}
-    verbose		3
+    verbose		2
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
     rsync_short_args	-a
