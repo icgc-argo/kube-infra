@@ -124,14 +124,16 @@ data:
 
     read -p "Continue (yes/no)?" choice
     case "$choice" in
-      yes ) echo "Executing restore...";;
+      yes )
+        echo "Executing restore..."
+        kafka-console-producer.sh --broker-list $kafka_server:9092 --topic $restore_topic < $restore_source
+        ;;
       * )
         echo "Exiting."
         exit
-      ;;
+        ;;
     esac
 
-    kafka-console-producer.sh --broker-list $kafka_server:9092 --topic $restore_topic < $restore_source
 
 
   connect-standalone.properties: |-
