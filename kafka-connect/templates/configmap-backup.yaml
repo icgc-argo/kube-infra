@@ -39,6 +39,7 @@ data:
 
 
     # rsnapshot
+    echo "Creating snapshot..."
     rsnapshot -c $rsnap_config alpha
 
     # cleanup
@@ -56,7 +57,7 @@ data:
     include	'*.gz'
     exclude	'*'
     retain	alpha	{{ .Values.backup.retention }}
-    verbose		3
+    verbose		2
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
     rsync_short_args	-a

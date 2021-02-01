@@ -22,23 +22,23 @@ data:
       do
         sink_name="${my_topic}-${sink_prefix}"
         sink_file=${sink_path}/${sink_name}-$(date +%Y-%m).sink
-        touch ${sink_file}
 
+        test -f ${sink_file} || touch ${sink_file}
         test -w ${sink_file} || { echo "File ${sink_file} is not writable" ; exit ; }
 
         echo "Topic: $my_topic  Sink file: ${sink_file}"
 
         # Create config file for each topic
-        echo "name=${sink_name}" > /etc/filesinkConfig/${sink_name}.properties
-        echo "connector.class=FileStreamSink" >> /etc/filesinkConfig/${sink_name}.properties
-        echo "tasks.max=1" >> /etc/filesinkConfig/${sink_name}.properties
-        echo "file=${sink_file}" >> /etc/filesinkConfig/${sink_name}.properties
-        echo "topics=$my_topic" >> /etc/filesinkConfig/${sink_name}.properties
         config_name="/etc/filesinkConfig/${sink_name}.properties"
+
+        echo "name=${sink_name}" > $config_name
+        echo "connector.class=FileStreamSink" >> $config_name
+        echo "tasks.max=1" >> $config_name
+        echo "file=${sink_file}" >> $config_name
+        echo "topics=$my_topic" >> $config_name
 
         # Create list of dynamic configs to pass to the connect process
         config_list+=($config_name)
-        sink_file_list+=($sink_file)
       done
 
     timeout -s HUP {{ .Values.restartTimeout }} /opt/bitnami/kafka/bin/connect-standalone.sh /etc/connectConfig/connect-standalone.properties ${config_list[@]}
@@ -59,8 +59,10 @@ data:
       done
 
     # backup if enabled
-    if [ $BACKUPS_ENABLED = "true" ]
+    if [ $BACKUPS_ENABLED = "true" ]; then
+      echo "Backing up connect data..."
       bash /etc/backupConfig/backup.sh
+      echo "Backup completed."
     fi
 
   restore.sh: |-
