@@ -1,5 +1,5 @@
 image:
-  name: icgcargo/backup-psql:latest
+  name: ghcr.io/icgc-argo/backup-psql:latest
   pullPolicy: Always
 
 imagePullSecrets: []
