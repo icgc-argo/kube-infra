@@ -1,6 +1,6 @@
 
 image:
-  name: icgcargo/backup-mongo:latest
+  name: ghcr.io/icgc-argo/backup-mongo:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
