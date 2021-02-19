@@ -1,6 +1,6 @@
 
 image:
-  name: icgcargo/kafka-connect:latest
+  name: ghcr.io/icgc-argo/kafka-connect:latest
 serviceAccount:
   create: true
   name: kafka-connect
