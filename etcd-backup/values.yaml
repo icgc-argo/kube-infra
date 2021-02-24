@@ -1,6 +1,6 @@
 
 image:
-  name: icgcargo/backup-etcd:latest
+  name: ghcr.io/icgc-argo/backup-etcd:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
