@@ -3,10 +3,11 @@ LABEL org.icgc-argo.kafka-connect.version=1.0.0
 USER root
 RUN apt-get update && apt-get install -y \
     gocryptfs \
+    fuse \
     rsnapshot \
     && rm -rf /var/lib/apt/lists/*
 RUN addgroup --system --gid 1001 kafka \
-    && adduser --system --uid 1001 --gid 1001 kafka 
+    && adduser --system --uid 1001 --gid 1001 kafka
 RUN mkdir /mnt/backup \
     && chown kafka /mnt/backup \
     && mkdir /run/backup \
