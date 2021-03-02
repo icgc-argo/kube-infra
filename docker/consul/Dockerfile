@@ -2,7 +2,7 @@ FROM alpine:3.9
 
 LABEL org.icgc-argo.consul-backup.version=1.0.0
 
-ENV CONSUL_VERSION=1.7.2
+ENV CONSUL_VERSION=1.9.3
 ENV HASHICORP_RELEASES=https://releases.hashicorp.com
 
 RUN addgroup consul && \
