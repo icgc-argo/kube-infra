@@ -1,6 +1,6 @@
 
 image:
-  name: icgcargo/consul-backup:latest
+  name: ghcr.io/icgc-argo/backup-jenkins:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
