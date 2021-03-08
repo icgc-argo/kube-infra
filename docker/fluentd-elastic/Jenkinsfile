@@ -47,7 +47,7 @@ spec:
           }
           sh """
             cd docker/fluentd-elastic
-            docker build . -t ${dockerRegistry}/${dockerRepo}:latest
+            docker build --network host . -t ${dockerRegistry}/${dockerRepo}:latest
             imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.fluentd-elastic.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
             docker build . -t ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:\$imageVersion
