@@ -26,6 +26,8 @@
 
 FROM ruby:2.7-slim-buster as builder
 
+LABEL org.icgc-argo.fluentd-etcd.version=3.2.0
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY Gemfile /Gemfile
