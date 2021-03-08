@@ -26,8 +26,6 @@
 
 FROM ruby:2.7-slim-buster as builder
 
-LABEL org.icgc-argo.fluentd-elastic.version=3.2.0
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY Gemfile /Gemfile
@@ -42,6 +40,7 @@ RUN apt-get update && \
     gem install --file Gemfile
 
 FROM ruby:2.7-slim-buster
+LABEL org.icgc-argo.fluentd-elastic.version=3.2.0
 
 ARG DEBIAN_FRONTEND=noninteractive
 
