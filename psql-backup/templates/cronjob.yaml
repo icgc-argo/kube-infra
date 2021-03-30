@@ -50,9 +50,6 @@ spec:
             runAsUser: 1001
           restartPolicy: OnFailure
           serviceAccountName: {{ include "psql-backup.serviceAccountName" . }}
-          tolerations:
-            - effect: NoSchedule
-              operator: Exists
           volumes:
             - name: backup
               emptyDir: {}
