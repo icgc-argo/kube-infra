@@ -1,0 +1,31 @@
+
+image:
+  name: ghcr.io/icgc-argo/backup-mongo:latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: dac-mongo-backup-dev
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+tolerations: []
+affinity: {}
+schedule:  "55 6 * * *"
+targetPvcName: nfs-backup
+retention: "7"
+encryptPassword: "encrypt"
+
+deployEnv: dev
+
+backupConfigs:
+  MONGO_HOST: mongo-host
+  MONGO_PORT: 27017
+  MONGO_DATABASE: mongo-db
+  MONGO_REPLICASET: rs0
+  BACKUP_ID: mongo-env
+  VAULT_SECRET_PATH: kv/secret/mongo
+  VAULT_K8_ROLE: mongo-role
+  VAULT_ADDR: https://vault.local
