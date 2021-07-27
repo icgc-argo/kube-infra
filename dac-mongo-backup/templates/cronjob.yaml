@@ -32,7 +32,7 @@ spec:
                   value: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
                 - name: VAULT_ADDR
                   value: "{{ .Values.backupConfigs.VAULT_ADDR }}"
-                - name: CLINICAL_MONGO_CTL_API
+                - name: DAC_MONGO_CTL_API
                   value: "3"
                 - name: NFS_USER_ID
                   value: "{{ .Values.nfsUserID }}"
