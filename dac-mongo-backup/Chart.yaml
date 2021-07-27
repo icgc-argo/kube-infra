@@ -1,0 +1,6 @@
+apiVersion: v2
+name: dac-mongo-backup
+description: Backup dac-mongo cluster
+type: application
+version: 0.2.1
+appVersion: 1.18.0
