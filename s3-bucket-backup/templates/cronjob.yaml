@@ -14,13 +14,16 @@ spec:
           annotations:
             vault.hashicorp.com/agent-inject: "true"
             vault.hashicorp.com/agent-inject-secret-s3_keys: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
-            vault.hashicorp.com/role: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
             vault.hashicorp.com/agent-inject-template-s3_keys: |
               {{`{{- with secret "kv/argo/lab/s3_keys" -}}
-              [s3]
+              [default]
               aws_access_key_id = {{ .Data.aws_access_key_id }}
               aws_secret_access_key = {{ .Data.aws_secret_access_key }}
               {{- end }}`}}
+            vault.hashicorp.com/agent-pre-populate-only: "true"
+            vault.hashicorp.com/role: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
+          labels:
+            app: s3-files-backup
         spec:
           containers:
             - name: backup
@@ -39,7 +42,7 @@ spec:
                   value: "{{ .Values.nfsUserID }}"
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
-              command: ["/bin/sh"]
+              command: ["/bin/bash"]
               # args: ["/opt/s3-files-backup-script/backup.sh"]
               args: ["-c","sleep 200000"]
               volumeMounts:
@@ -52,6 +55,13 @@ spec:
                 - mountPath: /opt/s3-files-backup-script
                   name: s3-files-backup-script
                   readOnly: true
+                - mountPath: /opt/rsnapshot-conf
+                  name: {{.Values.deployEnv }}-rsnapshot-conf
+                  readOnly: true
+              securityContext:
+                privileged: true
+                capabilities:
+                  add: ["SYS_ADMIN"]
           restartPolicy: OnFailure
           securityContext:
             runAsUser: 1001
@@ -71,3 +81,6 @@ spec:
             - name: s3-files-backup-script
               configMap:
                 name: {{.Values.deployEnv }}-s3-files-backup-script
+            - name: {{.Values.deployEnv }}-rsnapshot-conf
+              configMap:
+                name: {{.Values.deployEnv }}-rsnapshot-conf

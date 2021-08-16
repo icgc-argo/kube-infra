@@ -3,17 +3,18 @@ kind: PodSecurityPolicy
 metadata:
   name: {{ include "s3-files-backup.fullname" . }}
   labels:
-    {{- include "s3-files-backup.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "s3-files-backup.name" . }}
+    helm.sh/chart: {{ include "s3-files-backup.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  allowPrivilegeEscalation: false
+  privileged: true
   fsGroup:
     rule: RunAsAny
   allowedCapabilities:
-    - '*'
-  allowedHostPaths:
-    - pathPrefix: "/backup"
+    - 'SYS_ADMIN'
   runAsUser:
-    rule: RunAsAny
+    rule: MustRunAsNonRoot
   seLinux:
     rule: RunAsAny
   supplementalGroups:
@@ -22,3 +23,4 @@ spec:
     - configMap
     - persistentVolumeClaim
     - emptyDir
+    - secret

@@ -1,6 +1,6 @@
 
 image:
-  name: amazon/aws-cli
+  name: ghcr.io/icgc-argo/aws-cli:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
@@ -15,7 +15,7 @@ tolerations: []
 affinity: {}
 schedule:  "55 6 * * *"
 targetPvcName: nfs-backup
-retention: "7"
+retention: "21"
 encryptPassword: "encrypt"
 
 deployEnv: dev
@@ -28,3 +28,4 @@ backupConfigs:
   VAULT_K8_ROLE: s3-role
   VAULT_ADDR: https://vault.local
   AWS_SHARED_CREDENTIALS_FILE: /vault/secrets/s3_keys
+

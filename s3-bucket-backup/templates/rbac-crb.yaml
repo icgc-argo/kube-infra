@@ -7,7 +7,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: system:auth-delegator
+  name: {{ include "s3-files-backup.fullname" . }}
 subjects:
   - kind: ServiceAccount
     name: {{ include "s3-files-backup.serviceAccountName" . }}

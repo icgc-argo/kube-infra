@@ -1,0 +1,22 @@
+apiVersion: v1
+
+kind: ConfigMap
+metadata:
+  name: {{.Values.deployEnv }}-rsnapshot-conf
+
+data:
+  rsnapshot.conf: |-
+    config_version	1.2
+    snapshot_root	/backup/snap
+    cmd_cp		/bin/cp
+    cmd_rm		/bin/rm
+    cmd_rsync	/usr/bin/rsync
+    cmd_logger	/usr/bin/logger
+    cmd_rsnapshot_diff	/usr/bin/rsnapshot-diff
+    include	'*'
+    retain	alpha	{{ .Values.retention }}
+    verbose		2
+    loglevel	3
+    lockfile	/var/run/backup/rsnapshot.pid
+    rsync_short_args	-a
+    backup	/backup/replica	localhost/
