@@ -1,0 +1,26 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "s3-files-backup.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "s3-files-backup.name" . }}
+    helm.sh/chart: {{ include "s3-files-backup.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  privileged: true
+  fsGroup:
+    rule: RunAsAny
+  allowedCapabilities:
+    - 'SYS_ADMIN'
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - configMap
+    - persistentVolumeClaim
+    - emptyDir
+    - secret

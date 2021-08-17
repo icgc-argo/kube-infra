@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "s3-files-backup.fullname" . }}
+  labels:
+    {{- include "s3-files-backup.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - policy
+    resourceNames:
+      - {{ include "s3-files-backup.fullname" . }}
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
