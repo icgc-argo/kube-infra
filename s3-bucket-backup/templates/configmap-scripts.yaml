@@ -7,3 +7,5 @@ metadata:
 data:
   backup.sh: |-
 {{ .Files.Get "backup.sh" | indent 4 }}
+  mount.sh: |-
+{{ .Files.Get "mount.sh" | indent 4 }}
