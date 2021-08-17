@@ -1,5 +1,5 @@
 def dockerRegistry = "ghcr.io"
-def dockerRepo = "icgc-argo/kafka-connect"
+def dockerRepo = "icgc-argo/aws-cli"
 def imageVersion = ""
 
 pipeline {
@@ -46,9 +46,9 @@ spec:
             sh "docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD"
           }
           sh """
-            cd docker/kafka-connect
+            cd docker/aws-cli
             docker build . -t ${dockerRegistry}/${dockerRepo}:latest
-            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.kafka-connect.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
+            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.aws-cli.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
             docker build . -t ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:latest

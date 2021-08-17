@@ -14,4 +14,3 @@ RUN mkdir /mnt/backup \
     && chown kube-backup /run/backup \
     && chown -R kube-backup /opt/bitnami
 USER 1001
-CMD /opt/bitnami/kube-backup/bin/connect-standalone.sh /opt/bitnami/kube-backup/custConfig/connect-standalone.properties /opt/bitnami/kube-backup/custConfig/connect-file-sink.properties
