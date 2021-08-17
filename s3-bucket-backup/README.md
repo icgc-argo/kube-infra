@@ -32,3 +32,13 @@ backupConfigs:
 - `backupConfigs.VAULT_SECRET_PATH`: path to S3 access keys secret in vault
 - `backupConfigs.VAULT_K8_ROLE`: register this with vault for pod role
 - `backupConfigs.VAULT_ADDR`: FDQN of vault to retrieve secret from
+
+## Usage
+
+When the job runs first time, the encrypted volume needs to be initialized manually with the following command
+
+    gocryptfs -init -plaintextnames -passfile /etc/encrypt-key/password {backup_target}
+
+This exact command will be printed in the pod's log.
+When the encrypted volume is initalized, the master key is printed in the terminal, so it can be stored securely.
+

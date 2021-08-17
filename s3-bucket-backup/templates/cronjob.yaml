@@ -15,7 +15,7 @@ spec:
             vault.hashicorp.com/agent-inject: "true"
             vault.hashicorp.com/agent-inject-secret-s3_keys: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
             vault.hashicorp.com/agent-inject-template-s3_keys: |
-              {{`{{- with secret "kv/argo/lab/s3_keys" -}}
+              {{`{{- with secret "`}}{{ .Values.backupConfigs.VAULT_SECRET_PATH }} {{`" }}
               [default]
               aws_access_key_id = {{ .Data.aws_access_key_id }}
               aws_secret_access_key = {{ .Data.aws_secret_access_key }}
@@ -43,8 +43,8 @@ spec:
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
               command: ["/bin/bash"]
-              # args: ["/opt/s3-files-backup-script/backup.sh"]
-              args: ["-c","sleep 200000"]
+              args: ["/opt/s3-files-backup-script/backup.sh"]
+              # args: ["-c","sleep 200000"]
               volumeMounts:
                 - mountPath: /backup
                   name: backup
