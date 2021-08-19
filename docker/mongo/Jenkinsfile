@@ -1,5 +1,6 @@
 def dockerRegistry = "ghcr.io"
 def dockerRepo = "icgc-argo/backup-mongo"
+def versionLabel = "org.icgc-argo.mongo-backup.version"
 def imageVersion = ""
 
 pipeline {
@@ -64,7 +65,7 @@ spec:
           sh """
             cd docker/mongo
             docker build . -t ${dockerRegistry}/${dockerRepo}:latest
-            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.mongo-backup.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
+            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "${versionLabel}" }}' ${dockerRegistry}/${dockerRepo}:latest`
             docker build . -t ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:latest
