@@ -49,6 +49,9 @@ spec:
 
   stages {
     stage('Build and publish docker image') {
+      when {
+        branch "infra-nightly-builds"
+      }
       steps {
         container('docker') {
           withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
