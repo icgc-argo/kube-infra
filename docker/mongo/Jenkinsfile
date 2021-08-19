@@ -43,8 +43,12 @@ spec:
     }
   }
 
+  options {
+    disableConcurrentBuilds()
+  }
+
   triggers {
-    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? '50 16 * * *' : '')
+    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? '55 17 * * *' : '')
   }
 
   stages {
