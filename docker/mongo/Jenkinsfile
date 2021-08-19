@@ -49,13 +49,13 @@ spec:
   }
 
   triggers {
-    cron(env.BRANCH_NAME == 'master' ? '55 06 * * *' : '')
+    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? '55 06 * * *' : '')
   }
 
   stages {
     stage('Build and publish docker image') {
       when {
-        branch "master"
+        branch "infra-nightly-builds"
       }
       steps {
         container('docker') {
