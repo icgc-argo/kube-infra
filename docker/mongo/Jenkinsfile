@@ -14,6 +14,8 @@ spec:
   volumes:
   - name: dind-storage
     emptyDir: {}
+  securityContext:
+    runAsUser: 1000
   containers:
   - name: docker
     image: docker:19.03.14-git
@@ -23,10 +25,13 @@ spec:
     env:
     - name: DOCKER_HOST
       value: tcp://localhost:2375
+    - name: HOME
+      value: /home/jenkins/agent
   - name: dind
     image: docker:19.03.14-dind
     securityContext:
       privileged: true
+      runAsUser: 0
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ''
@@ -36,6 +41,10 @@ spec:
         mountPath: /var/lib/docker
 """
     }
+  }
+
+  triggers {
+    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? '50 16 * * *' : '')
   }
 
   stages {
