@@ -79,22 +79,21 @@ spec:
   }
   post {
     unsuccessful {
-      script {
-        if (env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" || env.BRANCH_NAME == "infra-nightly-builds") {
-          withCredentials([string(credentialsId: 'DevOpsSlackJenkinsBuildAlerts', variable: 'JenkinsFailuresSlackChannelURL')]) { 
+      container("jnlp") {
+        script {
+          withCredentials([string(credentialsId: 'DevOpsSlackJenkinsBuildAlerts', variable: 'JenkinsFailuresSlackChannelURL')]) {
             sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL}) \"}' ${JenkinsFailuresSlackChannelURL}"
           }
         }
       }
     }
     fixed {
-      script {
-        if (env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" || env.BRANCH_NAME == "infra-nightly-builds") {
-          withCredentials([string(credentialsId: 'DevOpsSlackJenkinsBuildAlerts', variable: 'JenkinsFailuresSlackChannelURL')]) { 
+      container("jnlp") {
+        script {
+          withCredentials([string(credentialsId: 'DevOpsSlackJenkinsBuildAlerts', variable: 'JenkinsFailuresSlackChannelURL')]) {
             sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Build Fixed: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL}) \"}' ${JenkinsFailuresSlackChannelURL}"
           }
         }
       }
     }
   }
-}
