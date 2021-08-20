@@ -50,7 +50,9 @@ spec:
   }
 
   triggers {
-    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? '55 06 * * *' : '')
+    cron(env.BRANCH_NAME == 'infra-nightly-builds' ? 'H 06 * * *' : '')
+    pollSCM('H/4 12-22 * * 1-5')
+
   }
 
   stages {
