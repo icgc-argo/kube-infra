@@ -27,6 +27,7 @@ spec:
     image: docker:19.03.14-dind
     securityContext:
       privileged: true
+      runAsUser: 0
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ''
