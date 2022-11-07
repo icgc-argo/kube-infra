@@ -51,9 +51,9 @@ spec:
             sh "docker login ${dockerRegistry} -u $USERNAME -p $PASSWORD"
           }
           sh """
-            cd docker/mongo
+            cd docker/python-kubespray
             docker build . -t ${dockerRegistry}/${dockerRepo}:latest
-            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.mongo-backup.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
+            imageVersion=`docker image inspect -f '{{ index .ContainerConfig.Labels "org.icgc-argo.python-kubespray.version" }}' ${dockerRegistry}/${dockerRepo}:latest`
             docker build . -t ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:\$imageVersion
             docker push ${dockerRegistry}/${dockerRepo}:latest
