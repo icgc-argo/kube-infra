@@ -13,5 +13,7 @@ RUN apt-get update; \
     git checkout v2.17.1; \
     pip3 install -r requirements.txt; \
     useradd -u 1001 kubespray
+    mkdir ~/.ssh
+    touch ~/.ssh/known_hosts
 
 USER 1001
