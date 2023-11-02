@@ -1,3 +1,6 @@
+crb:
+  create: false
+
 image:
   name: ghcr.io/icgc-argo/backup-psql:latest
   pullPolicy: Always
