@@ -11,8 +11,8 @@ serviceAccount:
 podSecurityContext: {}
 securityContext: {}
 resources: {}
-nodeSelector:
-  node-role.kubernetes.io/master: ""
+#nodeSelector:
+#  node-role.kubernetes.io/control-plane: ""
 tolerations: []
 affinity: {}
 schedule:  "55 6 * * *"
