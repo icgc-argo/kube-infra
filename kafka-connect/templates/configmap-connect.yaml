@@ -41,7 +41,7 @@ data:
         config_list+=($config_name)
       done
 
-    timeout -s HUP {{ .Values.restartTimeout }} /opt/bitnami/kafka/bin/connect-standalone.sh /etc/connectConfig/connect-standalone.properties ${config_list[@]}
+    timeout -s HUP $RESTART_TIMEOUT /opt/bitnami/kafka/bin/connect-standalone.sh /etc/connectConfig/connect-standalone.properties ${config_list[@]}
 
     # exit code 124 indicates that timeout timed out
     exit_code=$?

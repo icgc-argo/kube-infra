@@ -9,41 +9,22 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  backup.sh: |-
-    #!/bin/bash
-    set -e
+  backup.vars: |-
     data_path="{{ .Values.sinkPath }}"
-    backup_dev="/mnt/backup"
-    backup_dev_enc="/mnt/backup_enc"
+    backup_path="/mnt/backup"
     rsnap_config="/etc/backupConfig/rsnapshot.conf"
 
-    if [[ ! -d $data_path ]]
-      then
-        echo "The path does not exist: $data_path"
-        exit
-    fi
-    test -d $backup_dev || mkdir -p $backup_dev
-    test -d $backup_dev_enc || mkdir -p $backup_dev_enc
+  backup.sh: |-
+    #!/bin/bash
 
-    # Check if directory is not mounted
-    if [[ -z $(mount | grep "$backup_dev type fuse.gocryptfs") ]]
-      then
-        if [[ ! -f $backup_dev_enc/gocryptfs.conf ]]
-          then
-          echo "Initialize encrypted volume..."
-          gocryptfs -init -plaintextnames -passfile /etc/encrypt-key/password $backup_dev_enc
-        fi
-      echo "Mount encrypted FS"
-      gocryptfs -nosyslog -q -passfile /etc/encrypt-key/password $backup_dev_enc $backup_dev
-    fi
-
+    set -e
+    source /etc/backupConfig/backup.vars
+    test -d $data_path || { echo "Path $data_path does not exist" ; exit ; }
+    test -d $backup_path || { echo "Path $backup_path does not exist" ; exit ; }
 
     # rsnapshot
     echo "Creating snapshot..."
     rsnapshot -c $rsnap_config alpha
-
-    # cleanup
-    fusermount -u $backup_dev
 
   rsnapshot.conf: |-
     config_version	1.2
