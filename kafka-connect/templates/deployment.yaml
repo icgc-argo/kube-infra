@@ -32,11 +32,13 @@ spec:
           - "/etc/connectConfig/connect.sh"
           # - "-c"
           # - "sleep 3600"
-          {{- if .Values.backup.enabled }}
           env:
+          {{- if .Values.backup.enabled }}
           - name: BACKUPS_ENABLED
             value: "true"
           {{- end }}
+          - name: RESTART_TIMEOUT
+            value: "{{ .Values.restartTimeout }}"
           ports:
             - name: connector
               containerPort: 8083
@@ -54,9 +56,7 @@ spec:
             - name: config-backup
               mountPath: /etc/backupConfig
             - name: nfs-backup
-              mountPath: /mnt/backup_enc
-            - name: encrypt-key
-              mountPath: /etc/encrypt-key
+              mountPath: /mnt/backup
             {{- end }}
           securityContext:
             privileged: true
@@ -86,9 +86,6 @@ spec:
         - name: nfs-backup
           persistentVolumeClaim:
             claimName: {{ .Values.targetPvcName }}
-        - name: encrypt-key
-          secret:
-            secretName:  {{ include "kafka-connect.fullname" . }}-enc
         {{- end }}
       securityContext:
         fsGroup: 1001
