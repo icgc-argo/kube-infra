@@ -1,12 +1,30 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: Role
+metadata:
+  name: {{ include "kafka-connect.fullname" . }}
+  labels:
+    {{- include "kafka-connect.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - policy
+    resourceNames:
+      - {{ include "kafka-connect.fullname" . }}
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
   name: {{ include "kafka-connect.fullname" . }}
   labels:
     {{- include "kafka-connect.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: {{ include "kafka-connect.fullname" . }}
 subjects:
   - kind: ServiceAccount
