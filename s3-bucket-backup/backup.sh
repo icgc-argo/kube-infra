@@ -1,57 +1,35 @@
 #!/bin/bash
 set -e
 
-export BACKUP_DEV_ENC="/backup-target/s3-bucket-${S3_BUCKET_NAME}"
-export BACKUP_DEV="/backup"
-export BACKUP_PATH="/backup/replica"
-export BACKUP_DEV_MOUNTED=$(mount | grep "$BACKUP_DEV type fuse.gocryptfs")
-export GOCRYPTFS_CONF="$BACKUP_DEV_ENC/gocryptfs.conf"
-export GOCRYPTFS_PASSWD="/etc/encrypt-key/password"
+export BACKUP_PATH="/backup-target/s3-bucket-${S3_BUCKET_NAME}/${S3_BUCKET_PATH}"
+export SNAP_PATH="/backup-target/s3-bucket-${S3_BUCKET_NAME}/snap"
+export EFFECTIVE_USER=$(whoami)
 
-if [[ ! -d $BACKUP_DEV ]]
-  then
-  echo "Creating backup device directory: $BACKUP_DEV"
-  mkdir $BACKUP_DEV
+if ! [[ -d $BACKUP_PATH ]]; then
+  echo "$BACKUP_PATH directory doesnt exist, creating ... "
+  mkdir -p $BACKUP_PATH
 fi
 
-# Check if directory is not mounted, initialize if empty
-if [[ -z $BACKUP_DEV_MOUNTED ]]
-  then
-    if [[ ! -f $GOCRYPTFS_CONF ]]
-      then
-      echo "Initialize encrypted volume, login to this pod and enter the following command: "
-      echo
-      echo "gocryptfs -init -plaintextnames -passfile $GOCRYPTFS_PASSWD $BACKUP_DEV_ENC"
-      echo
-      echo "Please store the master key securely, in case the configuration file gets corrupted, the master key can be used to recreate it."
-      echo "This job will resume automatically in 5 min"
-      sleep 300
-    fi
-  echo "Mounting encrypted filesystem."
-  gocryptfs -nosyslog -q -passfile $GOCRYPTFS_PASSWD $BACKUP_DEV_ENC $BACKUP_DEV || exit
-  export BACKUP_DEV_MOUNTED=$(mount | grep "$BACKUP_DEV type fuse.gocryptfs" | awk '{print $1,$2,$3}')
-  echo "Filesystem mounted: $BACKUP_DEV_MOUNTED"
+if ! [[ -d $SNAP_PATH ]]; then
+  echo "$SNAP_PATH directory doesnt exist, creating ... "
+  mkdir -p $SNAP_PATH
 fi
 
-#check if mounted successfully
-export BACKUP_DEV_MOUNTED=$(mount | grep "$BACKUP_DEV type fuse.gocryptfs")
-if [[ -z $BACKUP_DEV_MOUNTED ]]
-  then
-    echo "Target filesystem not mounted. Exiting."
-    exit
+#rsnapshot needs this
+if ! [[ -O $SNAP_PATH ]]; then
+  echo "$SNAP_PATH not owned by $EFFECTIVE_USER, chowning ... "
+  chown -v $(whoami) $SNAP_PATH
 fi
 
-echo "Back up bucket: s3://${S3_BUCKET_NAME}"
-echo "Back up target: $BACKUP_DEV_ENC"
-echo "Endpoint URL: $S3_ENDPOINT_URL"
+echo "Back up bucket: s3://${S3_BUCKET_NAME}/${S3_BUCKET_PATH}"
+echo "Back up target: $BACKUP_PATH"
 echo "Backup started."
-aws s3 sync s3://${S3_BUCKET_NAME} $BACKUP_PATH  --endpoint-url $S3_ENDPOINT_URL
+aws s3 sync s3://${S3_BUCKET_NAME}/${S3_BUCKET_PATH} $BACKUP_PATH
 echo "Backup completed."
 
 # rsnapshot
 echo "Creating snapshot."
 rsnapshot -c /opt/rsnapshot-conf/rsnapshot.conf alpha
+echo "Completed snapshot."
 
-# cleanup
-echo "Unmounting encrypted filesystem."
-fusermount -u $BACKUP_DEV
+
