@@ -2,7 +2,7 @@
 set -e
 
 export BACKUP_PATH="/backup-target/s3-bucket-${S3_BUCKET_NAME}/${S3_BUCKET_PATH}"
-export SNAP_PATH="/backup-target/s3-bucket-${S3_BUCKET_NAME}/snap"
+export SNAP_PATH="/backup-target/s3-bucket-${S3_BUCKET_NAME}/${S3_BUCKET_PATH}-snap"
 export EFFECTIVE_USER=$(whoami)
 
 if ! [[ -d $BACKUP_PATH ]]; then
