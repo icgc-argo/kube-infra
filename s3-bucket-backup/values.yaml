@@ -21,7 +21,9 @@ encryptPassword: "encrypt"
 deployEnv: dev
 
 backupConfigs:
+
   S3_BUCKET_NAME: S3_BUCKET_NAME
+  S3_BUCKET_PATH: S3_BUCKET_PATH
   S3_ENDPOINT_URL: S3_ENDPOINT_URL
   BACKUP_ID: dev
   VAULT_SECRET_PATH: kv/argo/lab/s3_keys

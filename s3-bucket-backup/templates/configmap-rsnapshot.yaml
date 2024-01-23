@@ -7,8 +7,8 @@ metadata:
 data:
   rsnapshot.conf: |-
     config_version	1.2
-    snapshot_root	/backup/snap
-    cmd_cp		/bin/cp
+    snapshot_root	/backup-target/s3-bucket-{{.Values.backupConfigs.S3_BUCKET_NAME}}/snap/
+    cmd_cp	/bin/cp
     cmd_rm		/bin/rm
     cmd_rsync	/usr/bin/rsync
     cmd_logger	/usr/bin/logger
@@ -19,4 +19,5 @@ data:
     loglevel	3
     lockfile	/var/run/backup/rsnapshot.pid
     rsync_short_args	-a
-    backup	/backup/replica	localhost/
+    backup	/backup-target/s3-bucket-{{.Values.backupConfigs.S3_BUCKET_NAME}}/{{.Values.backupConfigs.S3_BUCKET_PATH}}	localhost/
+
