@@ -1,0 +1,80 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "s3-files-backup.fullname" . }}-restore
+  labels:
+    {{- include "s3-files-backup.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule:  "@yearly"
+  suspend: true
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/agent-inject-secret-s3_keys: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
+            vault.hashicorp.com/agent-inject-template-s3_keys: |
+              {{`{{- with secret "`}}{{ .Values.backupConfigs.VAULT_SECRET_PATH }}{{`" }}
+              [default]
+              aws_access_key_id = {{ .Data.aws_access_key_id }}
+              aws_secret_access_key = {{ .Data.aws_secret_access_key }}
+              region = {{ .Data.region }}
+              {{- end }}`}}
+            vault.hashicorp.com/agent-pre-populate-only: "true"
+            vault.hashicorp.com/role: "{{ .Values.backupConfigs.VAULT_K8_ROLE }}"
+          labels:
+            app: s3-files-restore
+        spec:
+          containers:
+            - name: backup
+              image: {{ .Values.image.name }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: S3_BUCKET_NAME
+                  value: "{{ .Values.backupConfigs.S3_BUCKET_NAME }}"
+                - name: S3_BUCKET_PATH
+                  value: "{{ .Values.backupConfigs.S3_BUCKET_PATH }}"
+                - name: BACKUP_ID
+                  value: "{{ .Values.backupConfigs.BACKUP_ID }}"
+                - name: AWS_SHARED_CREDENTIALS_FILE
+                  value: "{{ .Values.backupConfigs.AWS_SHARED_CREDENTIALS_FILE }}"
+                - name: NFS_USER_ID
+                  value: "{{ .Values.nfsUserID }}"
+                - name: RETENTION
+                  value: "{{ .Values.retention }}"
+              command: ["/bin/bash"]
+              args: ["-c","sleep 3600"]
+              volumeMounts:
+                - mountPath: /backup-target
+                  name: backup-target
+                - mountPath: /opt/s3-files-backup-script
+                  name: s3-files-backup-script
+                  readOnly: true
+                - mountPath: /opt/rsnapshot-conf
+                  name: {{.Values.deployEnv }}-rsnapshot-conf
+                  readOnly: true
+              securityContext:
+                privileged: true
+                capabilities:
+                  add: ["SYS_ADMIN"]
+          restartPolicy: Never
+          securityContext:
+            runAsUser: 1001
+          serviceAccountName: {{ include "s3-files-backup.serviceAccountName" . }}
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+          volumes:
+            - name: backup
+              emptyDir: {}
+            - name: backup-target
+              persistentVolumeClaim:
+                claimName: {{ .Values.targetPvcName }}
+            - name: s3-files-backup-script
+              configMap:
+                name: {{.Values.deployEnv }}-s3-files-backup-script
+            - name: {{.Values.deployEnv }}-rsnapshot-conf
+              configMap:
+                name: {{.Values.deployEnv }}-rsnapshot-conf
