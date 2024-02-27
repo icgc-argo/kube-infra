@@ -1,14 +1,35 @@
+---
+
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: {{ include "s3-files-backup.fullname" . }}
   labels:
     {{- include "s3-files-backup.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: {{ include "s3-files-backup.fullname" . }}
 subjects:
   - kind: ServiceAccount
     name: {{ include "s3-files-backup.serviceAccountName" . }}
     namespace: {{ $.Release.Namespace }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "s3-files-backup.fullname" . }}
+  labels:
+    {{- include "s3-files-backup.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - policy
+    resourceNames:
+      - {{ include "s3-files-backup.fullname" . }}
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+
