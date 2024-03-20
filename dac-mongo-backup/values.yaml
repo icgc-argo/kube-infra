@@ -29,3 +29,9 @@ backupConfigs:
   VAULT_SECRET_PATH: kv/secret/mongo
   VAULT_K8_ROLE: mongo-role
   VAULT_ADDR: https://vault.local
+
+psp:
+  enable: false
+authDelegator:
+  enable: false
+
