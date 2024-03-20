@@ -1,12 +1,13 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "dac-mongo-backup.fullname" . }}
+  name: {{ include "dac-mongo-backup.fullname" . }}-manual
   labels:
     {{- include "dac-mongo-backup.labels" . | nindent 4 }}
 spec:
   concurrencyPolicy: Forbid
   schedule:  {{ .Values.schedule }}
+  suspend: true
   jobTemplate:
     spec:
       template:
@@ -39,8 +40,8 @@ spec:
                 - name: RETENTION
                   value: "{{ .Values.retention }}"
               command: ["/bin/sh"]
-              args: ["/opt/dac-mongo-backup-script/backup.sh"]
-              # args: ["-c","sleep 200000"]
+              # args: ["/opt/dac-mongo-backup-script/backup.sh"]
+              args: ["-c","sleep 3600"]
               volumeMounts:
                 - mountPath: /backup
                   name: backup

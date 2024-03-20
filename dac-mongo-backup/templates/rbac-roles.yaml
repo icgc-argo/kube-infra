@@ -1,5 +1,6 @@
+{{- if .Values.psp.enable }}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: {{ include "dac-mongo-backup.fullname" . }}
   labels:
@@ -13,3 +14,4 @@ rules:
       - podsecuritypolicies
     verbs:
       - use
+{{- end}}
