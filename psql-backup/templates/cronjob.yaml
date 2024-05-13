@@ -10,6 +10,10 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          {{- with .Values.extraLabels }}
+            {{ toYaml . }}
+          {{- end }}
         spec:
           containers:
             - name: psql-backup

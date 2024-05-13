@@ -1,37 +1,30 @@
+affinity: {}
+backupConfigs:
+  BACKUP_ID: backup-id
+  PG_DATABASE: psql-database
+  PG_HOST: pg-host
+  PG_PORT: 5432
+  VAULT_ADDR: https://vault.local
+  VAULT_K8_ROLE: program-service-psql-role
+  VAULT_SECRET_PATH: kv/secret/psql-db
 crb:
   create: false
-
+deployEnv: qa
+encryptPassword: encrypt
+extraLabels: {}
+fullnameOverride: ''
 image:
   name: ghcr.io/icgc-argo/backup-psql:latest
   pullPolicy: Always
-
 imagePullSecrets: []
-
-nameOverride: ""
-fullnameOverride: ""
-
+nameOverride: ''
+podSecurityContext: {}
+resources: {}
+retention: '7'
+schedule: 55 6 * * *
+securityContext: {}
 serviceAccount:
   create: true
   name: program-service-psql-backup-qa
-
-podSecurityContext: {}
-securityContext: {}
-resources: {}
-tolerations: []
-affinity: {}
-
-schedule:  "55 6 * * *"
 targetPvcName: nfs-backup
-retention: "7"
-encryptPassword: "encrypt"
-
-deployEnv: "qa"
-
-backupConfigs:
-  PG_HOST: pg-host
-  PG_PORT: 5432
-  PG_DATABASE: psql-database
-  BACKUP_ID: backup-id
-  VAULT_SECRET_PATH: kv/secret/psql-db
-  VAULT_K8_ROLE: program-service-psql-role
-  VAULT_ADDR: https://vault.local
+tolerations: []
