@@ -9,6 +9,8 @@ imagePullSecrets: []
 nameOverride: ''
 nfsUserID: '1000'
 podSecurityContext: {}
+psp:
+  enable: false
 resources: {}
 retention: '7'
 schedule: 55 6 * * *
