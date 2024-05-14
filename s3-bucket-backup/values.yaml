@@ -1,33 +1,29 @@
-
+affinity: {}
+backupConfigs:
+  AWS_SHARED_CREDENTIALS_FILE: /vault/secrets/s3_keys
+  BACKUP_ID: dev
+  S3_BUCKET_NAME: S3_BUCKET_NAME
+  S3_BUCKET_PATH: S3_BUCKET_PATH
+  S3_ENDPOINT_URL: S3_ENDPOINT_URL
+  VAULT_ADDR: https://vault.local
+  VAULT_K8_ROLE: s3-role
+  VAULT_SECRET_PATH: kv/argo/lab/s3_keys
+deployEnv: dev
+encryptPassword: encrypt
+extraLabels: {}
+fullnameOverride: ''
 image:
   name: ghcr.io/icgc-argo/aws-cli:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+podSecurityContext: {}
+resources: {}
+retention: '21'
+schedule: 55 6 * * *
+securityContext: {}
 serviceAccount:
   create: true
   name: s3-files-backup-dev
-podSecurityContext: {}
-securityContext: {}
-resources: {}
-tolerations: []
-affinity: {}
-schedule:  "55 6 * * *"
 targetPvcName: nfs-backup
-retention: "21"
-encryptPassword: "encrypt"
-
-deployEnv: dev
-
-backupConfigs:
-
-  S3_BUCKET_NAME: S3_BUCKET_NAME
-  S3_BUCKET_PATH: S3_BUCKET_PATH
-  S3_ENDPOINT_URL: S3_ENDPOINT_URL
-  BACKUP_ID: dev
-  VAULT_SECRET_PATH: kv/argo/lab/s3_keys
-  VAULT_K8_ROLE: s3-role
-  VAULT_ADDR: https://vault.local
-  AWS_SHARED_CREDENTIALS_FILE: /vault/secrets/s3_keys
-
+tolerations: []
