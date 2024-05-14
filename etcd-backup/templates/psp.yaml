@@ -1,3 +1,4 @@
+{{- if .Values.psp.enable -}}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -31,3 +32,4 @@ spec:
   - persistentVolumeClaim
   - emptyDir
   - hostPath
+{{- end -}}
