@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "etcd-backup.fullname" . }}
@@ -10,6 +10,12 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "etcd-backup.labels" . | nindent 12 }}
+            {{- with .Values.extraLabels }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           containers:
             - name: backup

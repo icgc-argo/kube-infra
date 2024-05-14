@@ -1,22 +1,22 @@
-
+affinity: {}
+encryptPassword: ''
+extraLabels: {}
+fullnameOverride: ''
 image:
   name: ghcr.io/icgc-argo/backup-etcd:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+nfsUserID: '1000'
+podSecurityContext: {}
+resources: {}
+retention: '7'
+schedule: 55 6 * * *
+securityContext: {}
 serviceAccount:
   create: true
   name: etcd-backup
-podSecurityContext: {}
-securityContext: {}
-resources: {}
+targetPvcName: nfs-1
 #nodeSelector:
 #  node-role.kubernetes.io/control-plane: ""
 tolerations: []
-affinity: {}
-schedule:  "55 6 * * *"
-encryptPassword: ""
-nfsUserID: "1000"
-targetPvcName: nfs-1
-retention: "7"
