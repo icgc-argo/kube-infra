@@ -1,24 +1,24 @@
-
+affinity: {}
+backupID: consul
+consulSvcName: argo-vault-consulchart
+consulSvcNamespace: smoke
+deployEnv: infra
+encryptPassword: ''
+extraLabels: {}
+fullnameOverride: ''
 image:
   name: ghcr.io/icgc-argo/backup-consul:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+nfsUserID: '1000'
+podSecurityContext: {}
+resources: {}
+retention: '7'
+schedule: 55 6 * * *
+securityContext: {}
 serviceAccount:
   create: true
   name: consul-backup
-podSecurityContext: {}
-securityContext: {}
-resources: {}
-tolerations: []
-affinity: {}
-schedule:  "55 6 * * *"
-encryptPassword: ""
-nfsUserID: "1000"
 targetPvcName: nfs-1
-retention: "7"
-deployEnv: "infra"
-consulSvcName: "argo-vault-consulchart"
-consulSvcNamespace: "smoke"
-backupID: "consul"
+tolerations: []
