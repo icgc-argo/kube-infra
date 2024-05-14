@@ -1,4 +1,4 @@
-{{ if .Values.psp.enable }}
+{{- if .Values.psp.enable -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -29,4 +29,4 @@ subjects:
   - kind: ServiceAccount
     name: {{ include "clinical-mongo-backup.serviceAccountName" . }}
     namespace: {{ $.Release.Namespace }}
-{{ - end }}
+{{- end -}}
