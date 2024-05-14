@@ -10,12 +10,13 @@ spec:
   jobTemplate:
     spec:
       template:
-        spec:
+        metadata:
           labels:
             {{- include "dac-mongo-backup.labels" . | nindent 12 }}
             {{- with .Values.extraLabels }}
             {{ toYaml . | nindent 12 }}
             {{- end }}
+        spec:
           containers:
             - name: backup
               image: {{ .Values.image.name }}
