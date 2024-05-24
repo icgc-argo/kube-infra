@@ -1,4 +1,5 @@
 affinity: {}
+containerSecurityContext: {}
 backupConfigs:
   AWS_SHARED_CREDENTIALS_FILE: /vault/secrets/s3_keys
   BACKUP_ID: dev
@@ -18,10 +19,11 @@ image:
 imagePullSecrets: []
 nameOverride: ''
 podSecurityContext: {}
+psp:
+  enable: false
 resources: {}
 retention: '21'
 schedule: 55 6 * * *
-securityContext: {}
 serviceAccount:
   create: true
   name: s3-files-backup-dev

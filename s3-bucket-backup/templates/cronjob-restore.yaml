@@ -60,9 +60,9 @@ spec:
                   name: {{.Values.deployEnv }}-rsnapshot-conf
                   readOnly: true
               securityContext:
-                privileged: true
-                capabilities:
-                  add: ["SYS_ADMIN"]
+              {{- with .Values.containerSecurityContext }}
+                {{ toYaml . | nindent 14 }}
+              {{- end }}
           restartPolicy: Never
           securityContext:
             runAsUser: 1001
