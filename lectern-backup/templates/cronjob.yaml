@@ -10,6 +10,12 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "lectern-backup.labels" . | nindent 12 }}
+            {{- with .Values.extraLabels }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           containers:
             - name: backup
@@ -24,6 +30,8 @@ spec:
                   value: "{{ .Values.backupConfigs.BACKUP_ID }}"
                 - name: MONGO_DATABASE
                   value: "{{ .Values.backupConfigs.MONGO_DATABASE }}"
+                - name: MONGO_REPLICASET
+                  value: "{{ .Values.backupConfigs.MONGO_REPLICASET }}"
                 - name: VAULT_SECRET_PATH
                   value: "{{ .Values.backupConfigs.VAULT_SECRET_PATH }}"
                 - name: VAULT_K8_ROLE
