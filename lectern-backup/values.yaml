@@ -1,31 +1,31 @@
-
+affinity: {}
+backupConfigs:
+  BACKUP_ID: mongo-env
+  MONGO_DATABASE: mongo-db
+  MONGO_HOST: mongo-host
+  MONGO_PORT: 27017
+  MONGO_REPLICASET: rs0
+  VAULT_ADDR: https://vault.local
+  VAULT_K8_ROLE: mongo-role
+  VAULT_SECRET_PATH: kv/secret/mongo
+deployEnv: qa
+encryptPassword: encrypt
+extraLabels: {}
+fullnameOverride: ''
 image:
-  name: icgcargo/backup-mongo:latest
+  name: ghcr.io/icgc-argo/backup-mongo:latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+podSecurityContext: {}
+psp:
+  enable: false
+resources: {}
+retention: '7'
+schedule: 55 6 * * *
+securityContext: {}
 serviceAccount:
   create: true
   name: lectern-backup-qa
-podSecurityContext: {}
-securityContext: {}
-resources: {}
-tolerations: []
-affinity: {}
-schedule:  "55 6 * * *"
 targetPvcName: nfs-backup
-retention: "7"
-encryptPassword: "encrypt"
-
-deployEnv: qa
-
-backupConfigs:
-  MONGO_HOST: mongo-host
-  MONGO_PORT: 27017
-  MONGO_DATABASE: mogo-db
-  MONGO_REPLICASET: rs0
-  BACKUP_ID: mongo-env
-  VAULT_SECRET_PATH: kv/secret/mongo
-  VAULT_K8_ROLE: mongo-role
-  VAULT_ADDR: https://vault.local
+tolerations: []

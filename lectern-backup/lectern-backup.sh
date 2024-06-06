@@ -7,39 +7,19 @@ export SNAPSHOT_NAME="${TMP_DIR}/${BACKUP_ID}-snapshot-$(date +%Y-%m-%d_%H:%M:%S
 export VAULT=$(which vault)
 export JQ=$(which jq)
 
-# # downloads vault binary
-# export VAULT_BINARY_URL=https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip \
-#   && export VAULT_BINARY_ZIP="${TMP_DIR}/vault.zip" \
-#   && curl $VAULT_BINARY_URL --output $VAULT_BINARY_ZIP \
-#   && unzip $VAULT_BINARY_ZIP -d $TMP_DIR \
-#   && rm $VAULT_BINARY_ZIP \
-#   && export VAULT="${TMP_DIR}/vault"
-
-# # downloads jq binary
-# export JQ_BINARY_PATH="${TMP_DIR}/jq" \
-#   && curl -LJ https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output $JQ_BINARY_PATH \
-#   && chmod +x $JQ_BINARY_PATH \
-#   && export JQ=$JQ_BINARY_PATH
-
-echo "Finished Dependencies."
 
 # logs into vault
 export SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-  && export VAULT_TOKEN=$($VAULT write auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN} -format=json | $JQ --raw-output '.auth.client_token')
+  && export VAULT_TOKEN=$($VAULT write -field=token auth/kubernetes/login role=${VAULT_K8_ROLE} jwt=${SA_TOKEN})
 
-echo "Authenticated with Vault."
 
 # retrieves secret from vault
-export VAULT_MONGO_SECRET="$($VAULT read -format=json -field=data ${VAULT_SECRET_PATH})" \
-  && export MONGO_USERNAME=$(echo $VAULT_MONGO_SECRET \
-    | $JQ --raw-output ".MONGO_USER") \
-  && export MONGO_PASS=$(echo $VAULT_MONGO_SECRET \
-    | $JQ --raw-output ".MONGO_PASS")
-
-echo "Vault secrets obtained."
+export MONGO_USERNAME=$($VAULT kv get -field=MONGO_USER ${VAULT_SECRET_PATH})
+export MONGO_PASS=$($VAULT kv get -field=MONGO_PASS ${VAULT_SECRET_PATH})
 
 # creates mongo dump
-mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=rs0&authSource=admin" \
+echo "Creating mongo dump...."
+mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$MONGO_DATABASE?replicaSet=$MONGO_REPLICASET&authSource=admin" \
   --out=$SNAPSHOT_NAME \
   && tar -cv $SNAPSHOT_NAME | gzip > "${SNAPSHOT_NAME}.tar.gz" \
   && rm -rf $SNAPSHOT_NAME
@@ -47,7 +27,8 @@ mongodump --uri="mongodb://$MONGO_USERNAME:$MONGO_PASS@$MONGO_HOST:$MONGO_PORT/$
 echo "Mongo Dump Finished."
 
 # moves mongo dump to backup backup volume
-openssl aes-256-cbc -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
+echo "Encrypting mongo dump...."
+openssl aes-256-cbc -v -a -salt -in "${SNAPSHOT_NAME}.tar.gz"  -out "${SNAPSHOT_NAME}.enc" -kfile "/etc/encrypt-key/password"
 cp "${SNAPSHOT_NAME}.enc" /backup-target/${BACKUP_ID}
 export OLD_BACKUPS="$(find /backup-target/${BACKUP_ID}/* -mtime "+$RETENTION")"
 export RECENT_BACKUP_COUNT="$(find /backup-target/${BACKUP_ID}/* -mtime "-${RETENTION}" | wc -l)"
