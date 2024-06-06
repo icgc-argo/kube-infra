@@ -1,4 +1,6 @@
 affinity: {}
+authDelegator:
+  enable: false
 backupConfigs:
   BACKUP_ID: mongo-env
   MONGO_DATABASE: mongo-db
