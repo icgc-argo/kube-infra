@@ -24,3 +24,5 @@ backup:
 encryptPassword: "encryptPassword"
 targetPvcName: nfs-backup
 loglevel: ERROR
+podsecuritypolicy:
+  enabled: false
