@@ -120,7 +120,7 @@ data:
     test -w $restore_source || { echo "File $restore_source does not exist" ; exit ; }
 
 
-    cat $restore_files | awk -F'utcTime":"|"}}' '$2 >= "'$restore_from_time'"' > $restore_source
+    cat $restore_files | awk -F'utcTime":"' 'substr($2, 1, 10) >= "'$restore_from_time'"' > $restore_source
 
     read -p "Continue (yes/no)?" choice
     case "$choice" in
